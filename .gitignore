@@ -58,6 +58,14 @@ __pycache__/
 *.so
 .Python
 build/
+!build/
+build/*
+!build/recovery/
+build/recovery/*
+!build/recovery/hailo15-ne503/
+!build/recovery/hailo15-ne503/manifest.json
+!build/recovery/hailo15-ne503/fitImage
+!build/recovery/hailo15-ne503/swupdate-image-hailo15-ne503.ext4.gz
 develop-eggs/
 dist/
 dist-*/
@@ -309,6 +317,13 @@ bugtap/
 
 # Docs build output
 sdk/python/docs/en/_build/
+!sdk/
+!sdk/python/
+!sdk/python/docs/
+!sdk/python/docs/en/
+!sdk/python/docs/en/_build/
+!sdk/python/docs/en/_build/html/
+!sdk/python/docs/en/_build/html/**
 
 # Mock bundles
 web/src/mock/_*.bundled_*.mjs

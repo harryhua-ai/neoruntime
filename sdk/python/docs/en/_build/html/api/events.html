@@ -1,0 +1,1140 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Event Bus API &mdash; AIPC Platform Python SDK 0.3.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
+
+  
+    <link rel="shortcut icon" href="../_static/favicon.png"/>
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=e259d695"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Device Control API" href="device.html" />
+    <link rel="prev" title="Video Stream API" href="media.html" />
+ 
+<style>
+  .aipc-language-switch {
+    margin: 12px 12px 0;
+  }
+  .aipc-language-switch a {
+    display: block;
+    border: 1px solid rgba(255, 255, 255, 0.35);
+    border-radius: 4px;
+    color: #fff;
+    padding: 6px 10px;
+    text-align: center;
+    text-decoration: none;
+  }
+  .aipc-language-switch a:hover {
+    background: rgba(255, 255, 255, 0.12);
+  }
+</style>
+<script>
+  (function () {
+    function switchUrl(targetLanguage) {
+      var path = window.location.pathname;
+      if (targetLanguage === "en" && path.indexOf("/python/zh/") !== -1) {
+        return path.replace("/python/zh/", "/python/en/") + window.location.search + window.location.hash;
+      }
+      if (targetLanguage === "zh" && path.indexOf("/python/en/") !== -1) {
+        return path.replace("/python/en/", "/python/zh/") + window.location.search + window.location.hash;
+      }
+      return targetLanguage === "en" ? "../en/" : "../zh/";
+    }
+
+    document.addEventListener("DOMContentLoaded", function () {
+      var isEnglish = window.location.pathname.indexOf("/python/en/") !== -1;
+      var targetLanguage = isEnglish ? "zh" : "en";
+      var label = isEnglish ? "中文" : "English";
+      var container = document.createElement("div");
+      var link = document.createElement("a");
+
+      container.className = "aipc-language-switch";
+      link.href = switchUrl(targetLanguage);
+      link.textContent = label;
+      container.appendChild(link);
+
+      var sidebar = document.querySelector(".wy-side-nav-search");
+      if (sidebar) {
+        sidebar.appendChild(container);
+      }
+    });
+  }());
+</script>
+
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            AIPC Platform Python SDK
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">User Guide</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation Guide</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../installation.html#system-requirements">System Requirements</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../installation.html#dependencies">Dependencies</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../installation.html#installation-methods">Installation Methods</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../installation.html#install-from-pypi-recommended">Install from PyPI (Recommended)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../installation.html#install-from-source">Install from Source</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../installation.html#install-from-tarball">Install from Tarball</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../installation.html#verify-installation">Verify Installation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../installation.html#development-environment">Development Environment</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../installation.html#docker-environment">Docker Environment</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../installation.html#troubleshooting">Troubleshooting</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../installation.html#permission-issues">Permission Issues</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../installation.html#grpc-connection-failure">gRPC Connection Failure</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../installation.html#dependency-conflicts">Dependency Conflicts</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../quickstart.html">Quick Start</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../quickstart.html#basic-concepts">Basic Concepts</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../quickstart.html#first-application">First Application</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../quickstart.html#configuring-environment-variables">Configuring Environment Variables</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../quickstart.html#core-feature-examples">Core Feature Examples</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../quickstart.html#ai-inference">AI Inference</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../quickstart.html#single-shot-inference">Single-shot Inference</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../quickstart.html#streaming-inference">Streaming Inference</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../quickstart.html#model-management">Model Management</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../quickstart.html#event-bus">Event Bus</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../quickstart.html#publish-events">Publish Events</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../quickstart.html#subscribe-to-events">Subscribe to Events</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../quickstart.html#device-control">Device Control</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../quickstart.html#light-control">Light Control</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../quickstart.html#ptz-control">PTZ Control</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../quickstart.html#gpio-control">GPIO Control</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../quickstart.html#video-stream-access">Video Stream Access</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../quickstart.html#error-handling">Error Handling</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../quickstart.html#logging">Logging</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../quickstart.html#next-steps">Next Steps</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../app_image_guide.html">Application Image Build and Import Guide</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../app_image_guide.html#overview">Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../app_image_guide.html#step-1-prepare-application-files">Step 1: Prepare Application Files</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../app_image_guide.html#create-application-directory">Create Application Directory</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../app_image_guide.html#application-code-app-py">Application Code (app.py)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../app_image_guide.html#dockerfile">Dockerfile</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../app_image_guide.html#step-2-build-the-docker-image">Step 2: Build the Docker Image</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../app_image_guide.html#step-3-export-the-image">Step 3: Export the Image</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../app_image_guide.html#step-4-web-console-import-recommended">Step 4: Web Console Import (Recommended)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../app_image_guide.html#open-the-installation-wizard">Open the Installation Wizard</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../app_image_guide.html#wizard-steps">Wizard Steps</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../app_image_guide.html#step-5-command-line-import-alternative">Step 5: Command Line Import (Alternative)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../app_image_guide.html#application-manifest-reference-app-yaml">Application Manifest Reference (app.yaml)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../app_image_guide.html#metadata">Metadata</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../app_image_guide.html#resource-limits-spec-resources">Resource Limits (spec.resources)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../app_image_guide.html#permission-configuration-spec-permissions">Permission Configuration (spec.permissions)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../app_image_guide.html#lifecycle-configuration">Lifecycle Configuration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../app_image_guide.html#health-check">Health Check</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../app_image_guide.html#faq">FAQ</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../app_image_guide.html#image-build-failure">Image Build Failure</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../app_image_guide.html#image-file-too-large">Image File Too Large</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../app_image_guide.html#import-failure">Import Failure</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../app_image_guide.html#permission-error">Permission Error</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../examples.html">Examples</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../examples.html#person-detection-application">Person Detection Application</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../examples.html#vehicle-counting-application">Vehicle Counting Application</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../examples.html#smart-light-control">Smart Light Control</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../examples.html#video-recording-application">Video Recording Application</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../examples.html#multi-model-fusion-application">Multi-Model Fusion Application</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="inference.html">AI Inference API</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="inference.html#inferenceclient">InferenceClient</a></li>
+<li class="toctree-l2"><a class="reference internal" href="inference.html#data-types">Data Types</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="inference.html#inferenceresult">InferenceResult</a></li>
+<li class="toctree-l3"><a class="reference internal" href="inference.html#detectedobject">DetectedObject</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="inference.html#hailo_ipc_sdk.DetectedObject"><code class="docutils literal notranslate"><span class="pre">DetectedObject</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="inference.html#boundingbox">BoundingBox</a></li>
+<li class="toctree-l3"><a class="reference internal" href="inference.html#landmarkpoint">LandmarkPoint</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="inference.html#hailo_ipc_sdk.LandmarkPoint"><code class="docutils literal notranslate"><span class="pre">LandmarkPoint</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="inference.html#landmarkset">LandmarkSet</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="inference.html#hailo_ipc_sdk.LandmarkSet"><code class="docutils literal notranslate"><span class="pre">LandmarkSet</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="inference.html#segmentationmask">SegmentationMask</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="inference.html#hailo_ipc_sdk.SegmentationMask"><code class="docutils literal notranslate"><span class="pre">SegmentationMask</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="inference.html#ocrline">OcrLine</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="inference.html#hailo_ipc_sdk.OcrLine"><code class="docutils literal notranslate"><span class="pre">OcrLine</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="inference.html#embedding">Embedding</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="inference.html#hailo_ipc_sdk.Embedding"><code class="docutils literal notranslate"><span class="pre">Embedding</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="inference.html#depthmap">DepthMap</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="inference.html#hailo_ipc_sdk.DepthMap"><code class="docutils literal notranslate"><span class="pre">DepthMap</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="inference.html#classification">Classification</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="inference.html#hailo_ipc_sdk.Classification"><code class="docutils literal notranslate"><span class="pre">Classification</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="inference.html#modelinfo">ModelInfo</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="inference.html#hailo_ipc_sdk.ModelInfo"><code class="docutils literal notranslate"><span class="pre">ModelInfo</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="inference.html#usage-examples">Usage Examples</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="inference.html#single-shot-inference">Single-shot Inference</a></li>
+<li class="toctree-l3"><a class="reference internal" href="inference.html#streaming-inference">Streaming Inference</a></li>
+<li class="toctree-l3"><a class="reference internal" href="inference.html#tensor-inference">Tensor Inference</a></li>
+<li class="toctree-l3"><a class="reference internal" href="inference.html#model-management">Model Management</a></li>
+<li class="toctree-l3"><a class="reference internal" href="inference.html#getting-statistics">Getting Statistics</a></li>
+<li class="toctree-l3"><a class="reference internal" href="inference.html#session-management">Session Management</a></li>
+<li class="toctree-l3"><a class="reference internal" href="inference.html#handling-different-result-types">Handling Different Result Types</a></li>
+<li class="toctree-l3"><a class="reference internal" href="inference.html#context-manager">Context Manager</a></li>
+<li class="toctree-l3"><a class="reference internal" href="inference.html#error-handling">Error Handling</a></li>
+<li class="toctree-l3"><a class="reference internal" href="inference.html#segmentation-results">Segmentation Results</a></li>
+<li class="toctree-l3"><a class="reference internal" href="inference.html#ocr-results">OCR Results</a></li>
+<li class="toctree-l3"><a class="reference internal" href="inference.html#embedding-clip-image">Embedding (CLIP Image)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="inference.html#clip-text-encoding">CLIP Text Encoding</a></li>
+<li class="toctree-l3"><a class="reference internal" href="inference.html#depth-estimation">Depth Estimation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="inference.html#update-postprocess-config">Update Postprocess Config</a></li>
+<li class="toctree-l3"><a class="reference internal" href="inference.html#genai-llm-vlm">GenAI (LLM/VLM)</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="media.html">Video Stream API</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="media.html#fdmediaclient">FdMediaClient</a></li>
+<li class="toctree-l2"><a class="reference internal" href="media.html#data-types">Data Types</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="media.html#frame">Frame</a></li>
+<li class="toctree-l3"><a class="reference internal" href="media.html#streaminfo">StreamInfo</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="media.html#hailo_ipc_sdk.StreamInfo"><code class="docutils literal notranslate"><span class="pre">StreamInfo</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="media.html#pixelformat">PixelFormat</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="media.html#hailo_ipc_sdk.PixelFormat"><code class="docutils literal notranslate"><span class="pre">PixelFormat</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="media.html#usage-examples">Usage Examples</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="media.html#getting-raw-video-stream">Getting Raw Video Stream</a></li>
+<li class="toctree-l3"><a class="reference internal" href="media.html#no-frame-skipping">No Frame Skipping</a></li>
+<li class="toctree-l3"><a class="reference internal" href="media.html#getting-a-single-frame">Getting a Single Frame</a></li>
+<li class="toctree-l3"><a class="reference internal" href="media.html#getting-stream-info">Getting Stream Info</a></li>
+<li class="toctree-l3"><a class="reference internal" href="media.html#listing-available-streams">Listing Available Streams</a></li>
+<li class="toctree-l3"><a class="reference internal" href="media.html#frame-callback">Frame Callback</a></li>
+<li class="toctree-l3"><a class="reference internal" href="media.html#image-processing">Image Processing</a></li>
+<li class="toctree-l3"><a class="reference internal" href="media.html#saving-images">Saving Images</a></li>
+<li class="toctree-l3"><a class="reference internal" href="media.html#multi-stream-processing">Multi-Stream Processing</a></li>
+<li class="toctree-l3"><a class="reference internal" href="media.html#frame-rate-control">Frame Rate Control</a></li>
+<li class="toctree-l3"><a class="reference internal" href="media.html#saving-video">Saving Video</a></li>
+<li class="toctree-l3"><a class="reference internal" href="media.html#context-manager">Context Manager</a></li>
+<li class="toctree-l3"><a class="reference internal" href="media.html#zero-copy-access">Zero-Copy Access</a></li>
+<li class="toctree-l3"><a class="reference internal" href="media.html#error-handling">Error Handling</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Event Bus API</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#eventclient">EventClient</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#data-types">Data Types</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#event">Event</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#hailo_ipc_sdk.Event"><code class="docutils literal notranslate"><span class="pre">Event</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#topicinfo">TopicInfo</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#hailo_ipc_sdk.TopicInfo"><code class="docutils literal notranslate"><span class="pre">TopicInfo</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#usage-examples">Usage Examples</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#publishing-events">Publishing Events</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#subscribing-to-events">Subscribing to Events</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#using-callback-functions">Using Callback Functions</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#topic-wildcards">Topic Wildcards</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#listing-topics">Listing Topics</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#getting-statistics">Getting Statistics</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#unsubscribing">Unsubscribing</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#event-filtering">Event Filtering</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#context-manager">Context Manager</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#error-handling">Error Handling</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="device.html">Device Control API</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="device.html#deviceclient">DeviceClient</a></li>
+<li class="toctree-l2"><a class="reference internal" href="device.html#data-types">Data Types</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="device.html#devicestatus">DeviceStatus</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="device.html#hailo_ipc_sdk.DeviceStatus"><code class="docutils literal notranslate"><span class="pre">DeviceStatus</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="device.html#deviceevent">DeviceEvent</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="device.html#hailo_ipc_sdk.DeviceEvent"><code class="docutils literal notranslate"><span class="pre">DeviceEvent</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="device.html#ircutmode">IrCutMode</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="device.html#hailo_ipc_sdk.IrCutMode"><code class="docutils literal notranslate"><span class="pre">IrCutMode</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="device.html#usage-examples">Usage Examples</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="device.html#light-control">Light Control</a></li>
+<li class="toctree-l3"><a class="reference internal" href="device.html#ptz-control">PTZ Control</a></li>
+<li class="toctree-l3"><a class="reference internal" href="device.html#preset-control">Preset Control</a></li>
+<li class="toctree-l3"><a class="reference internal" href="device.html#lens-control">Lens Control</a></li>
+<li class="toctree-l3"><a class="reference internal" href="device.html#gpio-control">GPIO Control</a></li>
+<li class="toctree-l3"><a class="reference internal" href="device.html#wiegand-control">Wiegand Control</a></li>
+<li class="toctree-l3"><a class="reference internal" href="device.html#rs-485-serial-control">RS-485 Serial Control</a></li>
+<li class="toctree-l3"><a class="reference internal" href="device.html#getting-device-status">Getting Device Status</a></li>
+<li class="toctree-l3"><a class="reference internal" href="device.html#monitoring-device-events">Monitoring Device Events</a></li>
+<li class="toctree-l3"><a class="reference internal" href="device.html#context-manager">Context Manager</a></li>
+<li class="toctree-l3"><a class="reference internal" href="device.html#error-handling">Error Handling</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="app.html">Application Manager Client</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="app.html#hailo_ipc_sdk.app.AppInfo"><code class="docutils literal notranslate"><span class="pre">AppInfo</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="app.html#hailo_ipc_sdk.app.AppInfo.id"><code class="docutils literal notranslate"><span class="pre">AppInfo.id</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="app.html#hailo_ipc_sdk.app.AppInfo.name"><code class="docutils literal notranslate"><span class="pre">AppInfo.name</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="app.html#hailo_ipc_sdk.app.AppInfo.version"><code class="docutils literal notranslate"><span class="pre">AppInfo.version</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="app.html#hailo_ipc_sdk.app.AppInfo.state"><code class="docutils literal notranslate"><span class="pre">AppInfo.state</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="app.html#hailo_ipc_sdk.app.AppInfo.container_id"><code class="docutils literal notranslate"><span class="pre">AppInfo.container_id</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="app.html#hailo_ipc_sdk.app.AppInfo.pid"><code class="docutils literal notranslate"><span class="pre">AppInfo.pid</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="app.html#hailo_ipc_sdk.app.AppInfo.installed_at"><code class="docutils literal notranslate"><span class="pre">AppInfo.installed_at</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="app.html#hailo_ipc_sdk.app.AppInfo.started_at"><code class="docutils literal notranslate"><span class="pre">AppInfo.started_at</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="app.html#hailo_ipc_sdk.app.AppInfo.stopped_at"><code class="docutils literal notranslate"><span class="pre">AppInfo.stopped_at</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="app.html#hailo_ipc_sdk.app.AppInfo.restart_count"><code class="docutils literal notranslate"><span class="pre">AppInfo.restart_count</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="app.html#hailo_ipc_sdk.app.AppInfo.manifest_path"><code class="docutils literal notranslate"><span class="pre">AppInfo.manifest_path</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="app.html#hailo_ipc_sdk.app.AppInfo.instance_path"><code class="docutils literal notranslate"><span class="pre">AppInfo.instance_path</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="app.html#hailo_ipc_sdk.app.AppInfo.__init__"><code class="docutils literal notranslate"><span class="pre">AppInfo.__init__()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="app.html#hailo_ipc_sdk.app.AppStats"><code class="docutils literal notranslate"><span class="pre">AppStats</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="app.html#hailo_ipc_sdk.app.AppStats.app_id"><code class="docutils literal notranslate"><span class="pre">AppStats.app_id</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="app.html#hailo_ipc_sdk.app.AppStats.cpu_usage_percent"><code class="docutils literal notranslate"><span class="pre">AppStats.cpu_usage_percent</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="app.html#hailo_ipc_sdk.app.AppStats.memory_usage_bytes"><code class="docutils literal notranslate"><span class="pre">AppStats.memory_usage_bytes</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="app.html#hailo_ipc_sdk.app.AppStats.memory_limit_bytes"><code class="docutils literal notranslate"><span class="pre">AppStats.memory_limit_bytes</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="app.html#hailo_ipc_sdk.app.AppStats.thread_count"><code class="docutils literal notranslate"><span class="pre">AppStats.thread_count</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="app.html#hailo_ipc_sdk.app.AppStats.uptime_seconds"><code class="docutils literal notranslate"><span class="pre">AppStats.uptime_seconds</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="app.html#hailo_ipc_sdk.app.AppStats.__init__"><code class="docutils literal notranslate"><span class="pre">AppStats.__init__()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="app.html#hailo_ipc_sdk.app.LogLine"><code class="docutils literal notranslate"><span class="pre">LogLine</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="app.html#hailo_ipc_sdk.app.LogLine.timestamp"><code class="docutils literal notranslate"><span class="pre">LogLine.timestamp</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="app.html#hailo_ipc_sdk.app.LogLine.level"><code class="docutils literal notranslate"><span class="pre">LogLine.level</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="app.html#hailo_ipc_sdk.app.LogLine.message"><code class="docutils literal notranslate"><span class="pre">LogLine.message</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="app.html#hailo_ipc_sdk.app.LogLine.datetime"><code class="docutils literal notranslate"><span class="pre">LogLine.datetime</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="app.html#hailo_ipc_sdk.app.LogLine.__init__"><code class="docutils literal notranslate"><span class="pre">LogLine.__init__()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="app.html#hailo_ipc_sdk.app.AppClient"><code class="docutils literal notranslate"><span class="pre">AppClient</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="app.html#hailo_ipc_sdk.app.AppClient.__init__"><code class="docutils literal notranslate"><span class="pre">AppClient.__init__()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="app.html#hailo_ipc_sdk.app.AppClient.connect"><code class="docutils literal notranslate"><span class="pre">AppClient.connect()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="app.html#hailo_ipc_sdk.app.AppClient.connected"><code class="docutils literal notranslate"><span class="pre">AppClient.connected</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="app.html#hailo_ipc_sdk.app.AppClient.close"><code class="docutils literal notranslate"><span class="pre">AppClient.close()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="app.html#hailo_ipc_sdk.app.AppClient.register_web_url"><code class="docutils literal notranslate"><span class="pre">AppClient.register_web_url()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="app.html#hailo_ipc_sdk.app.AppClient.install_app"><code class="docutils literal notranslate"><span class="pre">AppClient.install_app()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="app.html#hailo_ipc_sdk.app.AppClient.start_app"><code class="docutils literal notranslate"><span class="pre">AppClient.start_app()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="app.html#hailo_ipc_sdk.app.AppClient.stop_app"><code class="docutils literal notranslate"><span class="pre">AppClient.stop_app()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="app.html#hailo_ipc_sdk.app.AppClient.uninstall_app"><code class="docutils literal notranslate"><span class="pre">AppClient.uninstall_app()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="app.html#hailo_ipc_sdk.app.AppClient.restart_app"><code class="docutils literal notranslate"><span class="pre">AppClient.restart_app()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="app.html#hailo_ipc_sdk.app.AppClient.list_apps"><code class="docutils literal notranslate"><span class="pre">AppClient.list_apps()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="app.html#hailo_ipc_sdk.app.AppClient.get_app"><code class="docutils literal notranslate"><span class="pre">AppClient.get_app()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="app.html#hailo_ipc_sdk.app.AppClient.get_app_stats"><code class="docutils literal notranslate"><span class="pre">AppClient.get_app_stats()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="app.html#hailo_ipc_sdk.app.AppClient.get_logs"><code class="docutils literal notranslate"><span class="pre">AppClient.get_logs()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="app.html#hailo_ipc_sdk.app.AppClient.get_logs_text"><code class="docutils literal notranslate"><span class="pre">AppClient.get_logs_text()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="app.html#usage-examples">Usage Examples</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="app.html#application-lifecycle">Application Lifecycle</a></li>
+<li class="toctree-l3"><a class="reference internal" href="app.html#getting-application-info">Getting Application Info</a></li>
+<li class="toctree-l3"><a class="reference internal" href="app.html#viewing-application-logs">Viewing Application Logs</a></li>
+<li class="toctree-l3"><a class="reference internal" href="app.html#registering-web-url">Registering Web URL</a></li>
+<li class="toctree-l3"><a class="reference internal" href="app.html#context-manager">Context Manager</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="plugin.html">Plugin System API</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="plugin.html#plugindiscovery">PluginDiscovery</a></li>
+<li class="toctree-l2"><a class="reference internal" href="plugin.html#pluginserver">PluginServer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="plugin.html#data-types">Data Types</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="plugin.html#pluginendpoint">PluginEndpoint</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="plugin.html#hailo_ipc_sdk.PluginEndpoint"><code class="docutils literal notranslate"><span class="pre">PluginEndpoint</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="plugin.html#usage-examples">Usage Examples</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="plugin.html#discovering-plugins">Discovering Plugins</a></li>
+<li class="toctree-l3"><a class="reference internal" href="plugin.html#waiting-for-plugin-ready">Waiting for Plugin Ready</a></li>
+<li class="toctree-l3"><a class="reference internal" href="plugin.html#listing-all-plugins">Listing All Plugins</a></li>
+<li class="toctree-l3"><a class="reference internal" href="plugin.html#invoking-plugin-services">Invoking Plugin Services</a></li>
+<li class="toctree-l3"><a class="reference internal" href="plugin.html#creating-a-plugin-server">Creating a Plugin Server</a></li>
+<li class="toctree-l3"><a class="reference internal" href="plugin.html#complete-plugin-example">Complete Plugin Example</a></li>
+<li class="toctree-l3"><a class="reference internal" href="plugin.html#plugin-dependencies">Plugin Dependencies</a></li>
+<li class="toctree-l3"><a class="reference internal" href="plugin.html#monitoring-plugin-changes">Monitoring Plugin Changes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="plugin.html#error-handling">Error Handling</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="config.html">Configuration API</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="config.html#config">Config</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="config.html#hailo_ipc_sdk.Config"><code class="docutils literal notranslate"><span class="pre">Config</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="config.html#hailo_ipc_sdk.Config.get_app_id"><code class="docutils literal notranslate"><span class="pre">Config.get_app_id()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="config.html#hailo_ipc_sdk.Config.get_inference_endpoint"><code class="docutils literal notranslate"><span class="pre">Config.get_inference_endpoint()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="config.html#hailo_ipc_sdk.Config.get_event_bus_endpoint"><code class="docutils literal notranslate"><span class="pre">Config.get_event_bus_endpoint()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="config.html#hailo_ipc_sdk.Config.get_device_control_endpoint"><code class="docutils literal notranslate"><span class="pre">Config.get_device_control_endpoint()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="config.html#hailo_ipc_sdk.Config.get_shm_base_path"><code class="docutils literal notranslate"><span class="pre">Config.get_shm_base_path()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="config.html#hailo_ipc_sdk.Config.get_camera_control_endpoint"><code class="docutils literal notranslate"><span class="pre">Config.get_camera_control_endpoint()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="config.html#hailo_ipc_sdk.Config.get_app_manager_endpoint"><code class="docutils literal notranslate"><span class="pre">Config.get_app_manager_endpoint()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="config.html#hailo_ipc_sdk.Config.get_encoded_socket_dir"><code class="docutils literal notranslate"><span class="pre">Config.get_encoded_socket_dir()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="config.html#hailo_ipc_sdk.Config.get_host_prefix"><code class="docutils literal notranslate"><span class="pre">Config.get_host_prefix()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="config.html#hailo_ipc_sdk.Config.translate_path_to_host"><code class="docutils literal notranslate"><span class="pre">Config.translate_path_to_host()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="config.html#hailo_ipc_sdk.Config.is_debug"><code class="docutils literal notranslate"><span class="pre">Config.is_debug()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="config.html#hailo_ipc_sdk.Config.get_log_level"><code class="docutils literal notranslate"><span class="pre">Config.get_log_level()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="config.html#usage-examples">Usage Examples</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="config.html#static-methods">Static Methods</a></li>
+<li class="toctree-l3"><a class="reference internal" href="config.html#environment-variable-configuration">Environment Variable Configuration</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Other</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../changelog.html">Changelog</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../changelog.html#v0-4-0-2026-07-14">v0.4.0 (2026-07-14)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../changelog.html#new-features">New Features</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../changelog.html#improvements">Improvements</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../changelog.html#v0-3-0-2026-05-18">v0.3.0 (2026-05-18)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../changelog.html#id1">New Features</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../changelog.html#id2">Improvements</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../changelog.html#bug-fixes">Bug Fixes</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../changelog.html#v0-2-0-2026-03-02">v0.2.0 (2026-03-02)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../changelog.html#id3">New Features</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../changelog.html#id4">Improvements</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../changelog.html#id5">Bug Fixes</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../changelog.html#v0-1-0-2025-12-15">v0.1.0 (2025-12-15)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../changelog.html#initial-release">Initial Release</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../contributing.html">Contributing Guide</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../contributing.html#development-environment-setup">Development Environment Setup</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../contributing.html#code-standards">Code Standards</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../contributing.html#testing">Testing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../contributing.html#submitting-code">Submitting Code</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../contributing.html#commit-message-convention">Commit Message Convention</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../contributing.html#documentation">Documentation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../contributing.html#reporting-issues">Reporting Issues</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../contributing.html#license">License</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../license.html">License</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">AIPC Platform Python SDK</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Event Bus API</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/api/events.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="event-bus-api">
+<h1>Event Bus API<a class="headerlink" href="#event-bus-api" title="Link to this heading"></a></h1>
+<p>Event Bus Client</p>
+<dl class="py class">
+<dt class="sig sig-object py">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">hailo_ipc_sdk.events.</span></span><span class="sig-name descname"><span class="pre">Event</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">topic:</span> <span class="pre">str,</span> <span class="pre">payload:</span> <span class="pre">Dict[str,</span> <span class="pre">Any],</span> <span class="pre">source:</span> <span class="pre">str</span> <span class="pre">=</span> <span class="pre">'',</span> <span class="pre">event_id:</span> <span class="pre">str</span> <span class="pre">=</span> <span class="pre">'',</span> <span class="pre">timestamp_ns:</span> <span class="pre">int</span> <span class="pre">=</span> <span class="pre">0,</span> <span class="pre">metadata:</span> <span class="pre">Dict[str,</span> <span class="pre">str]</span> <span class="pre">=</span> <span class="pre">&lt;factory&gt;</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hailo_ipc_sdk/events.html#Event"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<dl class="field-list simple">
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">topic</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></em></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">payload</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(in Python v3.14)"><span class="pre">Dict</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.14)"><span class="pre">Any</span></a><span class="p"><span class="pre">]</span></span></em></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">source</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">''</span></em></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">event_id</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">''</span></em></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">timestamp_ns</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0</span></em></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">metadata</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(in Python v3.14)"><span class="pre">Dict</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></em></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">to_json</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hailo_ipc_sdk/events.html#Event.to_json"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dd><dl class="field-list simple">
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_proto</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">msg</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hailo_ipc_sdk/events.html#Event.from_proto"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dd><dl class="field-list simple">
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">topic</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">payload</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">source=''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">event_id=''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timestamp_ns=0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metadata=&lt;factory&gt;</span></span></em><span class="sig-paren">)</span></dt>
+<dd><dl class="field-list simple">
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">hailo_ipc_sdk.events.</span></span><span class="sig-name descname"><span class="pre">TopicInfo</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">topic</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">subscriber_count</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">total_messages</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">last_message_ts</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hailo_ipc_sdk/events.html#TopicInfo"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<dl class="field-list simple">
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">topic</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></em></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">subscriber_count</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></em></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">total_messages</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></em></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">last_message_ts</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></em></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">topic</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">subscriber_count</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">total_messages</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">last_message_ts</span></span></em><span class="sig-paren">)</span></dt>
+<dd><dl class="field-list simple">
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">hailo_ipc_sdk.events.</span></span><span class="sig-name descname"><span class="pre">EventClient</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">endpoint</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hailo_ipc_sdk/events.html#EventClient"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Event Bus Client</p>
+<p>Usage:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">events</span> <span class="o">=</span> <span class="n">EventClient</span><span class="p">()</span>
+
+<span class="n">events</span><span class="o">.</span><span class="n">publish</span><span class="p">(</span><span class="s2">&quot;app/alert&quot;</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;person_detected&quot;</span><span class="p">})</span>
+
+<span class="k">for</span> <span class="n">event</span> <span class="ow">in</span> <span class="n">events</span><span class="o">.</span><span class="n">subscribe</span><span class="p">(</span><span class="s2">&quot;model/*/detections&quot;</span><span class="p">):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Received: </span><span class="si">{</span><span class="n">event</span><span class="o">.</span><span class="n">topic</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<dl class="field-list simple">
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">endpoint</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hailo_ipc_sdk/events.html#EventClient.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dd><dl class="field-list simple">
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">connect</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hailo_ipc_sdk/events.html#EventClient.connect"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dd><dl class="field-list simple">
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">connected</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><span class="pre">bool</span></a></em></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">close</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hailo_ipc_sdk/events.html#EventClient.close"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dd><dl class="field-list simple">
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">publish</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">topic</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">payload</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">persistent</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ttl_ms</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metadata</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hailo_ipc_sdk/events.html#EventClient.publish"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dd><dl class="field-list simple">
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">publish_batch</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">events</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">persistent</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hailo_ipc_sdk/events.html#EventClient.publish_batch"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dd><dl class="field-list simple">
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">subscribe</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">topic</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filters</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">queue_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">drop_old</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hailo_ipc_sdk/events.html#EventClient.subscribe"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dd><dl class="field-list simple">
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">on_event</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">topic</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">callback</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filters</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hailo_ipc_sdk/events.html#EventClient.on_event"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dd><dl class="field-list simple">
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">unsubscribe</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">topic</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hailo_ipc_sdk/events.html#EventClient.unsubscribe"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dd><dl class="field-list simple">
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">list_topics</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hailo_ipc_sdk/events.html#EventClient.list_topics"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dd><dl class="field-list simple">
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">get_topic_info</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">topic</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hailo_ipc_sdk/events.html#EventClient.get_topic_info"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dd><dl class="field-list simple">
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">get_stats</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hailo_ipc_sdk/events.html#EventClient.get_stats"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dd><dl class="field-list simple">
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">get_topic_stats</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">topic</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hailo_ipc_sdk/events.html#EventClient.get_topic_stats"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dd><dl class="field-list simple">
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<section id="eventclient">
+<h2>EventClient<a class="headerlink" href="#eventclient" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">hailo_ipc_sdk.</span></span><span class="sig-name descname"><span class="pre">EventClient</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">endpoint</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hailo_ipc_sdk/events.html#EventClient"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Event Bus Client</p>
+<p>Usage:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">events</span> <span class="o">=</span> <span class="n">EventClient</span><span class="p">()</span>
+
+<span class="n">events</span><span class="o">.</span><span class="n">publish</span><span class="p">(</span><span class="s2">&quot;app/alert&quot;</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;person_detected&quot;</span><span class="p">})</span>
+
+<span class="k">for</span> <span class="n">event</span> <span class="ow">in</span> <span class="n">events</span><span class="o">.</span><span class="n">subscribe</span><span class="p">(</span><span class="s2">&quot;model/*/detections&quot;</span><span class="p">):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Received: </span><span class="si">{</span><span class="n">event</span><span class="o">.</span><span class="n">topic</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<dl class="field-list simple">
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">endpoint</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hailo_ipc_sdk/events.html#EventClient.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dd><dl class="field-list simple">
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">connect</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hailo_ipc_sdk/events.html#EventClient.connect"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dd><dl class="field-list simple">
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">connected</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><span class="pre">bool</span></a></em></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">close</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hailo_ipc_sdk/events.html#EventClient.close"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dd><dl class="field-list simple">
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">publish</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">topic</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">payload</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">persistent</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ttl_ms</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metadata</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hailo_ipc_sdk/events.html#EventClient.publish"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dd><dl class="field-list simple">
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">publish_batch</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">events</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">persistent</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hailo_ipc_sdk/events.html#EventClient.publish_batch"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dd><dl class="field-list simple">
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">subscribe</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">topic</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filters</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">queue_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">drop_old</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hailo_ipc_sdk/events.html#EventClient.subscribe"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dd><dl class="field-list simple">
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">on_event</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">topic</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">callback</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filters</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hailo_ipc_sdk/events.html#EventClient.on_event"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dd><dl class="field-list simple">
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">unsubscribe</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">topic</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hailo_ipc_sdk/events.html#EventClient.unsubscribe"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dd><dl class="field-list simple">
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">list_topics</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hailo_ipc_sdk/events.html#EventClient.list_topics"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dd><dl class="field-list simple">
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">get_topic_info</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">topic</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hailo_ipc_sdk/events.html#EventClient.get_topic_info"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dd><dl class="field-list simple">
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">get_stats</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hailo_ipc_sdk/events.html#EventClient.get_stats"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dd><dl class="field-list simple">
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">get_topic_stats</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">topic</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hailo_ipc_sdk/events.html#EventClient.get_topic_stats"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dd><dl class="field-list simple">
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="data-types">
+<h2>Data Types<a class="headerlink" href="#data-types" title="Link to this heading"></a></h2>
+<section id="event">
+<h3>Event<a class="headerlink" href="#event" title="Link to this heading"></a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="hailo_ipc_sdk.Event">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">hailo_ipc_sdk.</span></span><span class="sig-name descname"><span class="pre">Event</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">topic:</span> <span class="pre">str,</span> <span class="pre">payload:</span> <span class="pre">Dict[str,</span> <span class="pre">Any],</span> <span class="pre">source:</span> <span class="pre">str</span> <span class="pre">=</span> <span class="pre">'',</span> <span class="pre">event_id:</span> <span class="pre">str</span> <span class="pre">=</span> <span class="pre">'',</span> <span class="pre">timestamp_ns:</span> <span class="pre">int</span> <span class="pre">=</span> <span class="pre">0,</span> <span class="pre">metadata:</span> <span class="pre">Dict[str,</span> <span class="pre">str]</span> <span class="pre">=</span> <span class="pre">&lt;factory&gt;</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hailo_ipc_sdk/events.html#Event"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hailo_ipc_sdk.Event" title="Link to this definition"></a></dt>
+<dd><dl class="field-list simple">
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="hailo_ipc_sdk.Event.topic">
+<span class="sig-name descname"><span class="pre">topic</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></em><a class="headerlink" href="#hailo_ipc_sdk.Event.topic" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="hailo_ipc_sdk.Event.payload">
+<span class="sig-name descname"><span class="pre">payload</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(in Python v3.14)"><span class="pre">Dict</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.14)"><span class="pre">Any</span></a><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#hailo_ipc_sdk.Event.payload" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="hailo_ipc_sdk.Event.source">
+<span class="sig-name descname"><span class="pre">source</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">''</span></em><a class="headerlink" href="#hailo_ipc_sdk.Event.source" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="hailo_ipc_sdk.Event.event_id">
+<span class="sig-name descname"><span class="pre">event_id</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">''</span></em><a class="headerlink" href="#hailo_ipc_sdk.Event.event_id" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="hailo_ipc_sdk.Event.timestamp_ns">
+<span class="sig-name descname"><span class="pre">timestamp_ns</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0</span></em><a class="headerlink" href="#hailo_ipc_sdk.Event.timestamp_ns" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="hailo_ipc_sdk.Event.metadata">
+<span class="sig-name descname"><span class="pre">metadata</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(in Python v3.14)"><span class="pre">Dict</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#hailo_ipc_sdk.Event.metadata" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="hailo_ipc_sdk.Event.to_json">
+<span class="sig-name descname"><span class="pre">to_json</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hailo_ipc_sdk/events.html#Event.to_json"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hailo_ipc_sdk.Event.to_json" title="Link to this definition"></a></dt>
+<dd><dl class="field-list simple">
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="hailo_ipc_sdk.Event.from_proto">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_proto</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">msg</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hailo_ipc_sdk/events.html#Event.from_proto"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hailo_ipc_sdk.Event.from_proto" title="Link to this definition"></a></dt>
+<dd><dl class="field-list simple">
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="hailo_ipc_sdk.Event.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">topic</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">payload</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">source=''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">event_id=''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timestamp_ns=0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metadata=&lt;factory&gt;</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#hailo_ipc_sdk.Event.__init__" title="Link to this definition"></a></dt>
+<dd><dl class="field-list simple">
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="topicinfo">
+<h3>TopicInfo<a class="headerlink" href="#topicinfo" title="Link to this heading"></a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="hailo_ipc_sdk.TopicInfo">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">hailo_ipc_sdk.</span></span><span class="sig-name descname"><span class="pre">TopicInfo</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">topic</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">subscriber_count</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">total_messages</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">last_message_ts</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hailo_ipc_sdk/events.html#TopicInfo"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hailo_ipc_sdk.TopicInfo" title="Link to this definition"></a></dt>
+<dd><dl class="field-list simple">
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="hailo_ipc_sdk.TopicInfo.topic">
+<span class="sig-name descname"><span class="pre">topic</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></em><a class="headerlink" href="#hailo_ipc_sdk.TopicInfo.topic" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="hailo_ipc_sdk.TopicInfo.subscriber_count">
+<span class="sig-name descname"><span class="pre">subscriber_count</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></em><a class="headerlink" href="#hailo_ipc_sdk.TopicInfo.subscriber_count" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="hailo_ipc_sdk.TopicInfo.total_messages">
+<span class="sig-name descname"><span class="pre">total_messages</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></em><a class="headerlink" href="#hailo_ipc_sdk.TopicInfo.total_messages" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="hailo_ipc_sdk.TopicInfo.last_message_ts">
+<span class="sig-name descname"><span class="pre">last_message_ts</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></em><a class="headerlink" href="#hailo_ipc_sdk.TopicInfo.last_message_ts" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="hailo_ipc_sdk.TopicInfo.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">topic</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">subscriber_count</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">total_messages</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">last_message_ts</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#hailo_ipc_sdk.TopicInfo.__init__" title="Link to this definition"></a></dt>
+<dd><dl class="field-list simple">
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+</section>
+<section id="usage-examples">
+<h2>Usage Examples<a class="headerlink" href="#usage-examples" title="Link to this heading"></a></h2>
+<section id="publishing-events">
+<h3>Publishing Events<a class="headerlink" href="#publishing-events" title="Link to this heading"></a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">hailo_ipc_sdk</span><span class="w"> </span><span class="kn">import</span> <span class="n">EventClient</span>
+
+<span class="n">events</span> <span class="o">=</span> <span class="n">EventClient</span><span class="p">()</span>
+
+<span class="c1"># Publish simple event</span>
+<span class="n">events</span><span class="o">.</span><span class="n">publish</span><span class="p">(</span><span class="s2">&quot;app/status&quot;</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;status&quot;</span><span class="p">:</span> <span class="s2">&quot;running&quot;</span><span class="p">})</span>
+
+<span class="c1"># Publish event with metadata</span>
+<span class="n">events</span><span class="o">.</span><span class="n">publish</span><span class="p">(</span><span class="s2">&quot;app/detection&quot;</span><span class="p">,</span> <span class="p">{</span>
+    <span class="s2">&quot;timestamp&quot;</span><span class="p">:</span> <span class="mi">1234567890</span><span class="p">,</span>
+    <span class="s2">&quot;objects&quot;</span><span class="p">:</span> <span class="p">[</span>
+        <span class="p">{</span><span class="s2">&quot;label&quot;</span><span class="p">:</span> <span class="s2">&quot;person&quot;</span><span class="p">,</span> <span class="s2">&quot;score&quot;</span><span class="p">:</span> <span class="mf">0.95</span><span class="p">,</span> <span class="s2">&quot;bbox&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">100</span><span class="p">,</span> <span class="mi">200</span><span class="p">,</span> <span class="mi">50</span><span class="p">,</span> <span class="mi">100</span><span class="p">]},</span>
+        <span class="p">{</span><span class="s2">&quot;label&quot;</span><span class="p">:</span> <span class="s2">&quot;car&quot;</span><span class="p">,</span> <span class="s2">&quot;score&quot;</span><span class="p">:</span> <span class="mf">0.88</span><span class="p">,</span> <span class="s2">&quot;bbox&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">300</span><span class="p">,</span> <span class="mi">400</span><span class="p">,</span> <span class="mi">80</span><span class="p">,</span> <span class="mi">120</span><span class="p">]}</span>
+    <span class="p">]</span>
+<span class="p">},</span> <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;camera&quot;</span><span class="p">:</span> <span class="s2">&quot;cam0&quot;</span><span class="p">,</span> <span class="s2">&quot;model&quot;</span><span class="p">:</span> <span class="s2">&quot;person_vehicle_v1&quot;</span><span class="p">})</span>
+
+<span class="c1"># Publish persistent event</span>
+<span class="n">events</span><span class="o">.</span><span class="n">publish</span><span class="p">(</span><span class="s2">&quot;app/alert&quot;</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;person_detected&quot;</span><span class="p">},</span> <span class="n">persistent</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+<span class="c1"># Batch publish</span>
+<span class="n">events</span><span class="o">.</span><span class="n">publish_batch</span><span class="p">([</span>
+    <span class="p">{</span><span class="s2">&quot;topic&quot;</span><span class="p">:</span> <span class="s2">&quot;app/event1&quot;</span><span class="p">,</span> <span class="s2">&quot;payload&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;data&quot;</span><span class="p">:</span> <span class="s2">&quot;value1&quot;</span><span class="p">}},</span>
+    <span class="p">{</span><span class="s2">&quot;topic&quot;</span><span class="p">:</span> <span class="s2">&quot;app/event2&quot;</span><span class="p">,</span> <span class="s2">&quot;payload&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;data&quot;</span><span class="p">:</span> <span class="s2">&quot;value2&quot;</span><span class="p">}}</span>
+<span class="p">])</span>
+</pre></div>
+</div>
+</section>
+<section id="subscribing-to-events">
+<h3>Subscribing to Events<a class="headerlink" href="#subscribing-to-events" title="Link to this heading"></a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Subscribe to a single topic</span>
+<span class="k">for</span> <span class="n">event</span> <span class="ow">in</span> <span class="n">events</span><span class="o">.</span><span class="n">subscribe</span><span class="p">(</span><span class="s2">&quot;system/temperature&quot;</span><span class="p">):</span>
+    <span class="n">temp</span> <span class="o">=</span> <span class="n">event</span><span class="o">.</span><span class="n">payload</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;value&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Current temperature: </span><span class="si">{</span><span class="n">temp</span><span class="si">}</span><span class="s2">°C&quot;</span><span class="p">)</span>
+
+<span class="c1"># Subscribe to multiple topics (wildcards)</span>
+<span class="k">for</span> <span class="n">event</span> <span class="ow">in</span> <span class="n">events</span><span class="o">.</span><span class="n">subscribe</span><span class="p">(</span><span class="s2">&quot;model/*/detections&quot;</span><span class="p">):</span>
+    <span class="n">model_name</span> <span class="o">=</span> <span class="n">event</span><span class="o">.</span><span class="n">topic</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">count</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">event</span><span class="o">.</span><span class="n">payload</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;objects&quot;</span><span class="p">,</span> <span class="p">[]))</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Model </span><span class="si">{</span><span class="n">model_name</span><span class="si">}</span><span class="s2"> detected </span><span class="si">{</span><span class="n">count</span><span class="si">}</span><span class="s2"> object(s)&quot;</span><span class="p">)</span>
+
+<span class="c1"># Subscribe with filters</span>
+<span class="k">for</span> <span class="n">event</span> <span class="ow">in</span> <span class="n">events</span><span class="o">.</span><span class="n">subscribe</span><span class="p">(</span><span class="s2">&quot;app/alerts&quot;</span><span class="p">,</span> <span class="n">filters</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;severity&quot;</span><span class="p">:</span> <span class="s2">&quot;high&quot;</span><span class="p">}):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;High severity alert: </span><span class="si">{</span><span class="n">event</span><span class="o">.</span><span class="n">payload</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="using-callback-functions">
+<h3>Using Callback Functions<a class="headerlink" href="#using-callback-functions" title="Link to this heading"></a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">on_alert</span><span class="p">(</span><span class="n">event</span><span class="p">):</span>
+    <span class="n">alert_type</span> <span class="o">=</span> <span class="n">event</span><span class="o">.</span><span class="n">payload</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;type&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Alert received: </span><span class="si">{</span><span class="n">alert_type</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">on_detection</span><span class="p">(</span><span class="n">event</span><span class="p">):</span>
+    <span class="n">objects</span> <span class="o">=</span> <span class="n">event</span><span class="o">.</span><span class="n">payload</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;objects&quot;</span><span class="p">,</span> <span class="p">[])</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Detected </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">objects</span><span class="p">)</span><span class="si">}</span><span class="s2"> object(s)&quot;</span><span class="p">)</span>
+
+<span class="c1"># Register callbacks</span>
+<span class="n">events</span><span class="o">.</span><span class="n">on_event</span><span class="p">(</span><span class="s2">&quot;app/alert&quot;</span><span class="p">,</span> <span class="n">on_alert</span><span class="p">)</span>
+<span class="n">events</span><span class="o">.</span><span class="n">on_event</span><span class="p">(</span><span class="s2">&quot;model/*/detections&quot;</span><span class="p">,</span> <span class="n">on_detection</span><span class="p">)</span>
+
+<span class="c1"># Keep running</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
+<span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+    <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="topic-wildcards">
+<h3>Topic Wildcards<a class="headerlink" href="#topic-wildcards" title="Link to this heading"></a></h3>
+<p>The event bus supports wildcards:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Matches model/person_v1/detections, model/car_v1/detections</span>
+<span class="n">events</span><span class="o">.</span><span class="n">subscribe</span><span class="p">(</span><span class="s2">&quot;model/*/detections&quot;</span><span class="p">)</span>
+
+<span class="c1"># Matches app/my_app/alert, app/my_app/status/running</span>
+<span class="n">events</span><span class="o">.</span><span class="n">subscribe</span><span class="p">(</span><span class="s2">&quot;app/my_app/**&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="listing-topics">
+<h3>Listing Topics<a class="headerlink" href="#listing-topics" title="Link to this heading"></a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># List all active topics</span>
+<span class="n">topics</span> <span class="o">=</span> <span class="n">events</span><span class="o">.</span><span class="n">list_topics</span><span class="p">()</span>
+<span class="k">for</span> <span class="n">topic</span> <span class="ow">in</span> <span class="n">topics</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">topic</span><span class="o">.</span><span class="n">topic</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">topic</span><span class="o">.</span><span class="n">subscriber_count</span><span class="si">}</span><span class="s2"> subscribers, </span><span class="si">{</span><span class="n">topic</span><span class="o">.</span><span class="n">total_messages</span><span class="si">}</span><span class="s2"> messages&quot;</span><span class="p">)</span>
+
+<span class="c1"># Get specific topic info</span>
+<span class="n">info</span> <span class="o">=</span> <span class="n">events</span><span class="o">.</span><span class="n">get_topic_info</span><span class="p">(</span><span class="s2">&quot;app/alerts&quot;</span><span class="p">)</span>
+<span class="k">if</span> <span class="n">info</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Subscribers: </span><span class="si">{</span><span class="n">info</span><span class="o">.</span><span class="n">subscriber_count</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="getting-statistics">
+<h3>Getting Statistics<a class="headerlink" href="#getting-statistics" title="Link to this heading"></a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Get global statistics</span>
+<span class="n">stats</span> <span class="o">=</span> <span class="n">events</span><span class="o">.</span><span class="n">get_stats</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Total subscribers: </span><span class="si">{</span><span class="n">stats</span><span class="p">[</span><span class="s1">&#39;total_subscribers&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Total topics: </span><span class="si">{</span><span class="n">stats</span><span class="p">[</span><span class="s1">&#39;total_topics&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Uptime: </span><span class="si">{</span><span class="n">stats</span><span class="p">[</span><span class="s1">&#39;uptime_ms&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">ms&quot;</span><span class="p">)</span>
+
+<span class="c1"># Get specific topic statistics</span>
+<span class="n">topic_stats</span> <span class="o">=</span> <span class="n">events</span><span class="o">.</span><span class="n">get_topic_stats</span><span class="p">(</span><span class="s2">&quot;app/alerts&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Published: </span><span class="si">{</span><span class="n">topic_stats</span><span class="p">[</span><span class="s1">&#39;published_count&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Delivered: </span><span class="si">{</span><span class="n">topic_stats</span><span class="p">[</span><span class="s1">&#39;delivered_count&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Dropped: </span><span class="si">{</span><span class="n">topic_stats</span><span class="p">[</span><span class="s1">&#39;dropped_count&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Average latency: </span><span class="si">{</span><span class="n">topic_stats</span><span class="p">[</span><span class="s1">&#39;avg_latency_us&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">us&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="unsubscribing">
+<h3>Unsubscribing<a class="headerlink" href="#unsubscribing" title="Link to this heading"></a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Unsubscribe</span>
+<span class="n">events</span><span class="o">.</span><span class="n">unsubscribe</span><span class="p">(</span><span class="s2">&quot;app/alert&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="event-filtering">
+<h3>Event Filtering<a class="headerlink" href="#event-filtering" title="Link to this heading"></a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Subscribe and filter</span>
+<span class="k">for</span> <span class="n">event</span> <span class="ow">in</span> <span class="n">events</span><span class="o">.</span><span class="n">subscribe</span><span class="p">(</span><span class="s2">&quot;model/*/detections&quot;</span><span class="p">):</span>
+    <span class="c1"># Only process high-confidence detections</span>
+    <span class="n">objects</span> <span class="o">=</span> <span class="n">event</span><span class="o">.</span><span class="n">payload</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;objects&quot;</span><span class="p">,</span> <span class="p">[])</span>
+    <span class="n">high_conf</span> <span class="o">=</span> <span class="p">[</span><span class="n">obj</span> <span class="k">for</span> <span class="n">obj</span> <span class="ow">in</span> <span class="n">objects</span> <span class="k">if</span> <span class="n">obj</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;score&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mf">0.9</span><span class="p">]</span>
+
+    <span class="k">if</span> <span class="n">high_conf</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;High confidence detections: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">high_conf</span><span class="p">)</span><span class="si">}</span><span class="s2"> object(s)&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="context-manager">
+<h3>Context Manager<a class="headerlink" href="#context-manager" title="Link to this heading"></a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Use context manager for automatic connection management</span>
+<span class="k">with</span> <span class="n">EventClient</span><span class="p">()</span> <span class="k">as</span> <span class="n">events</span><span class="p">:</span>
+    <span class="n">events</span><span class="o">.</span><span class="n">publish</span><span class="p">(</span><span class="s2">&quot;app/status&quot;</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;status&quot;</span><span class="p">:</span> <span class="s2">&quot;running&quot;</span><span class="p">})</span>
+    <span class="k">for</span> <span class="n">event</span> <span class="ow">in</span> <span class="n">events</span><span class="o">.</span><span class="n">subscribe</span><span class="p">(</span><span class="s2">&quot;app/*&quot;</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Received: </span><span class="si">{</span><span class="n">event</span><span class="o">.</span><span class="n">topic</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="error-handling">
+<h3>Error Handling<a class="headerlink" href="#error-handling" title="Link to this heading"></a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">grpc</span><span class="w"> </span><span class="kn">import</span> <span class="n">RpcError</span>
+
+<span class="k">try</span><span class="p">:</span>
+    <span class="n">events</span><span class="o">.</span><span class="n">publish</span><span class="p">(</span><span class="s2">&quot;app/status&quot;</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;status&quot;</span><span class="p">:</span> <span class="s2">&quot;running&quot;</span><span class="p">})</span>
+<span class="k">except</span> <span class="n">RpcError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Publish failed: </span><span class="si">{</span><span class="n">e</span><span class="o">.</span><span class="n">details</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<span class="k">try</span><span class="p">:</span>
+    <span class="k">for</span> <span class="n">event</span> <span class="ow">in</span> <span class="n">events</span><span class="o">.</span><span class="n">subscribe</span><span class="p">(</span><span class="s2">&quot;invalid/topic&quot;</span><span class="p">):</span>
+        <span class="n">process_event</span><span class="p">(</span><span class="n">event</span><span class="p">)</span>
+<span class="k">except</span> <span class="n">RpcError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Subscription failed: </span><span class="si">{</span><span class="n">e</span><span class="o">.</span><span class="n">details</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="media.html" class="btn btn-neutral float-left" title="Video Stream API" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="device.html" class="btn btn-neutral float-right" title="Device Control API" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025-2026, CamThink.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

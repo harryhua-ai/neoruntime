@@ -1,0 +1,18 @@
+{
+  "format": 1,
+  "machine": "hailo15-ne503",
+  "bsp_version": "1.11.0",
+  "recovery_version": "1.0.1",
+  "local_update_protocol": "AIPC_LOCAL_RECOVERY_V1",
+  "secure_boot_key_id": "",
+  "fit_image": {
+    "file": "fitImage",
+    "sha256": "29e769b6ba6b11580977739f7dac3dfa99d968fe0c96ed3b027d3b8403e482c0",
+    "size": 8372736
+  },
+  "rootfs": {
+    "file": "swupdate-image-hailo15-ne503.ext4.gz",
+    "sha256": "c5baa6a5d5dcea3314b61e4e506854b1e2477b0c8e0db8d7bafeed4b29e14562",
+    "size": 10670155
+  }
+}

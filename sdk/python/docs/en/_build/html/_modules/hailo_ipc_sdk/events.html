@@ -1,0 +1,878 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>hailo_ipc_sdk.events &mdash; AIPC Platform Python SDK 0.3.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
+
+  
+    <link rel="shortcut icon" href="../../_static/favicon.png"/>
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=e259d695"></script>
+      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            AIPC Platform Python SDK
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">User Guide</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../installation.html">Installation Guide</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../installation.html#system-requirements">System Requirements</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../installation.html#dependencies">Dependencies</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../installation.html#installation-methods">Installation Methods</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../installation.html#install-from-pypi-recommended">Install from PyPI (Recommended)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../installation.html#install-from-source">Install from Source</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../installation.html#install-from-tarball">Install from Tarball</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../installation.html#verify-installation">Verify Installation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../installation.html#development-environment">Development Environment</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../installation.html#docker-environment">Docker Environment</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../installation.html#troubleshooting">Troubleshooting</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../installation.html#permission-issues">Permission Issues</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../installation.html#grpc-connection-failure">gRPC Connection Failure</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../installation.html#dependency-conflicts">Dependency Conflicts</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../quickstart.html">Quick Start</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../quickstart.html#basic-concepts">Basic Concepts</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../quickstart.html#first-application">First Application</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../quickstart.html#configuring-environment-variables">Configuring Environment Variables</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../quickstart.html#core-feature-examples">Core Feature Examples</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../quickstart.html#ai-inference">AI Inference</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../quickstart.html#single-shot-inference">Single-shot Inference</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../quickstart.html#streaming-inference">Streaming Inference</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../quickstart.html#model-management">Model Management</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../quickstart.html#event-bus">Event Bus</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../quickstart.html#publish-events">Publish Events</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../quickstart.html#subscribe-to-events">Subscribe to Events</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../quickstart.html#device-control">Device Control</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../quickstart.html#light-control">Light Control</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../quickstart.html#ptz-control">PTZ Control</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../quickstart.html#gpio-control">GPIO Control</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../quickstart.html#video-stream-access">Video Stream Access</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../quickstart.html#error-handling">Error Handling</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../quickstart.html#logging">Logging</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../quickstart.html#next-steps">Next Steps</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../app_image_guide.html">Application Image Build and Import Guide</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../app_image_guide.html#overview">Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../app_image_guide.html#step-1-prepare-application-files">Step 1: Prepare Application Files</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../app_image_guide.html#create-application-directory">Create Application Directory</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../app_image_guide.html#application-code-app-py">Application Code (app.py)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../app_image_guide.html#dockerfile">Dockerfile</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../app_image_guide.html#step-2-build-the-docker-image">Step 2: Build the Docker Image</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../app_image_guide.html#step-3-export-the-image">Step 3: Export the Image</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../app_image_guide.html#step-4-web-console-import-recommended">Step 4: Web Console Import (Recommended)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../app_image_guide.html#open-the-installation-wizard">Open the Installation Wizard</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../app_image_guide.html#wizard-steps">Wizard Steps</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../app_image_guide.html#step-5-command-line-import-alternative">Step 5: Command Line Import (Alternative)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../app_image_guide.html#application-manifest-reference-app-yaml">Application Manifest Reference (app.yaml)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../app_image_guide.html#metadata">Metadata</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../app_image_guide.html#resource-limits-spec-resources">Resource Limits (spec.resources)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../app_image_guide.html#permission-configuration-spec-permissions">Permission Configuration (spec.permissions)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../app_image_guide.html#lifecycle-configuration">Lifecycle Configuration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../app_image_guide.html#health-check">Health Check</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../app_image_guide.html#faq">FAQ</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../app_image_guide.html#image-build-failure">Image Build Failure</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../app_image_guide.html#image-file-too-large">Image File Too Large</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../app_image_guide.html#import-failure">Import Failure</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../app_image_guide.html#permission-error">Permission Error</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../examples.html">Examples</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../examples.html#person-detection-application">Person Detection Application</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../examples.html#vehicle-counting-application">Vehicle Counting Application</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../examples.html#smart-light-control">Smart Light Control</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../examples.html#video-recording-application">Video Recording Application</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../examples.html#multi-model-fusion-application">Multi-Model Fusion Application</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../api/inference.html">AI Inference API</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../api/inference.html#inferenceclient">InferenceClient</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../api/inference.html#data-types">Data Types</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../api/inference.html#inferenceresult">InferenceResult</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/inference.html#detectedobject">DetectedObject</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../api/inference.html#hailo_ipc_sdk.DetectedObject"><code class="docutils literal notranslate"><span class="pre">DetectedObject</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/inference.html#boundingbox">BoundingBox</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/inference.html#landmarkpoint">LandmarkPoint</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../api/inference.html#hailo_ipc_sdk.LandmarkPoint"><code class="docutils literal notranslate"><span class="pre">LandmarkPoint</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/inference.html#landmarkset">LandmarkSet</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../api/inference.html#hailo_ipc_sdk.LandmarkSet"><code class="docutils literal notranslate"><span class="pre">LandmarkSet</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/inference.html#segmentationmask">SegmentationMask</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../api/inference.html#hailo_ipc_sdk.SegmentationMask"><code class="docutils literal notranslate"><span class="pre">SegmentationMask</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/inference.html#ocrline">OcrLine</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../api/inference.html#hailo_ipc_sdk.OcrLine"><code class="docutils literal notranslate"><span class="pre">OcrLine</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/inference.html#embedding">Embedding</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../api/inference.html#hailo_ipc_sdk.Embedding"><code class="docutils literal notranslate"><span class="pre">Embedding</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/inference.html#depthmap">DepthMap</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../api/inference.html#hailo_ipc_sdk.DepthMap"><code class="docutils literal notranslate"><span class="pre">DepthMap</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/inference.html#classification">Classification</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../api/inference.html#hailo_ipc_sdk.Classification"><code class="docutils literal notranslate"><span class="pre">Classification</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/inference.html#modelinfo">ModelInfo</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../api/inference.html#hailo_ipc_sdk.ModelInfo"><code class="docutils literal notranslate"><span class="pre">ModelInfo</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../api/inference.html#usage-examples">Usage Examples</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../api/inference.html#single-shot-inference">Single-shot Inference</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/inference.html#streaming-inference">Streaming Inference</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/inference.html#tensor-inference">Tensor Inference</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/inference.html#model-management">Model Management</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/inference.html#getting-statistics">Getting Statistics</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/inference.html#session-management">Session Management</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/inference.html#handling-different-result-types">Handling Different Result Types</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/inference.html#context-manager">Context Manager</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/inference.html#error-handling">Error Handling</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/inference.html#segmentation-results">Segmentation Results</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/inference.html#ocr-results">OCR Results</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/inference.html#embedding-clip-image">Embedding (CLIP Image)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/inference.html#clip-text-encoding">CLIP Text Encoding</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/inference.html#depth-estimation">Depth Estimation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/inference.html#update-postprocess-config">Update Postprocess Config</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/inference.html#genai-llm-vlm">GenAI (LLM/VLM)</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../api/media.html">Video Stream API</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../api/media.html#fdmediaclient">FdMediaClient</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../api/media.html#data-types">Data Types</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../api/media.html#frame">Frame</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/media.html#streaminfo">StreamInfo</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../api/media.html#hailo_ipc_sdk.StreamInfo"><code class="docutils literal notranslate"><span class="pre">StreamInfo</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/media.html#pixelformat">PixelFormat</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../api/media.html#hailo_ipc_sdk.PixelFormat"><code class="docutils literal notranslate"><span class="pre">PixelFormat</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../api/media.html#usage-examples">Usage Examples</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../api/media.html#getting-raw-video-stream">Getting Raw Video Stream</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/media.html#no-frame-skipping">No Frame Skipping</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/media.html#getting-a-single-frame">Getting a Single Frame</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/media.html#getting-stream-info">Getting Stream Info</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/media.html#listing-available-streams">Listing Available Streams</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/media.html#frame-callback">Frame Callback</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/media.html#image-processing">Image Processing</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/media.html#saving-images">Saving Images</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/media.html#multi-stream-processing">Multi-Stream Processing</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/media.html#frame-rate-control">Frame Rate Control</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/media.html#saving-video">Saving Video</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/media.html#context-manager">Context Manager</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/media.html#zero-copy-access">Zero-Copy Access</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/media.html#error-handling">Error Handling</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../api/events.html">Event Bus API</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../api/events.html#eventclient">EventClient</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../api/events.html#data-types">Data Types</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../api/events.html#event">Event</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../api/events.html#hailo_ipc_sdk.Event"><code class="docutils literal notranslate"><span class="pre">Event</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/events.html#topicinfo">TopicInfo</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../api/events.html#hailo_ipc_sdk.TopicInfo"><code class="docutils literal notranslate"><span class="pre">TopicInfo</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../api/events.html#usage-examples">Usage Examples</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../api/events.html#publishing-events">Publishing Events</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/events.html#subscribing-to-events">Subscribing to Events</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/events.html#using-callback-functions">Using Callback Functions</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/events.html#topic-wildcards">Topic Wildcards</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/events.html#listing-topics">Listing Topics</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/events.html#getting-statistics">Getting Statistics</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/events.html#unsubscribing">Unsubscribing</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/events.html#event-filtering">Event Filtering</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/events.html#context-manager">Context Manager</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/events.html#error-handling">Error Handling</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../api/device.html">Device Control API</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../api/device.html#deviceclient">DeviceClient</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../api/device.html#data-types">Data Types</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../api/device.html#devicestatus">DeviceStatus</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../api/device.html#hailo_ipc_sdk.DeviceStatus"><code class="docutils literal notranslate"><span class="pre">DeviceStatus</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/device.html#deviceevent">DeviceEvent</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../api/device.html#hailo_ipc_sdk.DeviceEvent"><code class="docutils literal notranslate"><span class="pre">DeviceEvent</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/device.html#ircutmode">IrCutMode</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../api/device.html#hailo_ipc_sdk.IrCutMode"><code class="docutils literal notranslate"><span class="pre">IrCutMode</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../api/device.html#usage-examples">Usage Examples</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../api/device.html#light-control">Light Control</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/device.html#ptz-control">PTZ Control</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/device.html#preset-control">Preset Control</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/device.html#lens-control">Lens Control</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/device.html#gpio-control">GPIO Control</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/device.html#wiegand-control">Wiegand Control</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/device.html#rs-485-serial-control">RS-485 Serial Control</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/device.html#getting-device-status">Getting Device Status</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/device.html#monitoring-device-events">Monitoring Device Events</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/device.html#context-manager">Context Manager</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/device.html#error-handling">Error Handling</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../api/app.html">Application Manager Client</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../api/app.html#hailo_ipc_sdk.app.AppInfo"><code class="docutils literal notranslate"><span class="pre">AppInfo</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../api/app.html#hailo_ipc_sdk.app.AppInfo.id"><code class="docutils literal notranslate"><span class="pre">AppInfo.id</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/app.html#hailo_ipc_sdk.app.AppInfo.name"><code class="docutils literal notranslate"><span class="pre">AppInfo.name</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/app.html#hailo_ipc_sdk.app.AppInfo.version"><code class="docutils literal notranslate"><span class="pre">AppInfo.version</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/app.html#hailo_ipc_sdk.app.AppInfo.state"><code class="docutils literal notranslate"><span class="pre">AppInfo.state</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/app.html#hailo_ipc_sdk.app.AppInfo.container_id"><code class="docutils literal notranslate"><span class="pre">AppInfo.container_id</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/app.html#hailo_ipc_sdk.app.AppInfo.pid"><code class="docutils literal notranslate"><span class="pre">AppInfo.pid</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/app.html#hailo_ipc_sdk.app.AppInfo.installed_at"><code class="docutils literal notranslate"><span class="pre">AppInfo.installed_at</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/app.html#hailo_ipc_sdk.app.AppInfo.started_at"><code class="docutils literal notranslate"><span class="pre">AppInfo.started_at</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/app.html#hailo_ipc_sdk.app.AppInfo.stopped_at"><code class="docutils literal notranslate"><span class="pre">AppInfo.stopped_at</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/app.html#hailo_ipc_sdk.app.AppInfo.restart_count"><code class="docutils literal notranslate"><span class="pre">AppInfo.restart_count</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/app.html#hailo_ipc_sdk.app.AppInfo.manifest_path"><code class="docutils literal notranslate"><span class="pre">AppInfo.manifest_path</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/app.html#hailo_ipc_sdk.app.AppInfo.instance_path"><code class="docutils literal notranslate"><span class="pre">AppInfo.instance_path</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/app.html#hailo_ipc_sdk.app.AppInfo.__init__"><code class="docutils literal notranslate"><span class="pre">AppInfo.__init__()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../api/app.html#hailo_ipc_sdk.app.AppStats"><code class="docutils literal notranslate"><span class="pre">AppStats</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../api/app.html#hailo_ipc_sdk.app.AppStats.app_id"><code class="docutils literal notranslate"><span class="pre">AppStats.app_id</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/app.html#hailo_ipc_sdk.app.AppStats.cpu_usage_percent"><code class="docutils literal notranslate"><span class="pre">AppStats.cpu_usage_percent</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/app.html#hailo_ipc_sdk.app.AppStats.memory_usage_bytes"><code class="docutils literal notranslate"><span class="pre">AppStats.memory_usage_bytes</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/app.html#hailo_ipc_sdk.app.AppStats.memory_limit_bytes"><code class="docutils literal notranslate"><span class="pre">AppStats.memory_limit_bytes</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/app.html#hailo_ipc_sdk.app.AppStats.thread_count"><code class="docutils literal notranslate"><span class="pre">AppStats.thread_count</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/app.html#hailo_ipc_sdk.app.AppStats.uptime_seconds"><code class="docutils literal notranslate"><span class="pre">AppStats.uptime_seconds</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/app.html#hailo_ipc_sdk.app.AppStats.__init__"><code class="docutils literal notranslate"><span class="pre">AppStats.__init__()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../api/app.html#hailo_ipc_sdk.app.LogLine"><code class="docutils literal notranslate"><span class="pre">LogLine</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../api/app.html#hailo_ipc_sdk.app.LogLine.timestamp"><code class="docutils literal notranslate"><span class="pre">LogLine.timestamp</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/app.html#hailo_ipc_sdk.app.LogLine.level"><code class="docutils literal notranslate"><span class="pre">LogLine.level</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/app.html#hailo_ipc_sdk.app.LogLine.message"><code class="docutils literal notranslate"><span class="pre">LogLine.message</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/app.html#hailo_ipc_sdk.app.LogLine.datetime"><code class="docutils literal notranslate"><span class="pre">LogLine.datetime</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/app.html#hailo_ipc_sdk.app.LogLine.__init__"><code class="docutils literal notranslate"><span class="pre">LogLine.__init__()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../api/app.html#hailo_ipc_sdk.app.AppClient"><code class="docutils literal notranslate"><span class="pre">AppClient</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../api/app.html#hailo_ipc_sdk.app.AppClient.__init__"><code class="docutils literal notranslate"><span class="pre">AppClient.__init__()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/app.html#hailo_ipc_sdk.app.AppClient.connect"><code class="docutils literal notranslate"><span class="pre">AppClient.connect()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/app.html#hailo_ipc_sdk.app.AppClient.connected"><code class="docutils literal notranslate"><span class="pre">AppClient.connected</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/app.html#hailo_ipc_sdk.app.AppClient.close"><code class="docutils literal notranslate"><span class="pre">AppClient.close()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/app.html#hailo_ipc_sdk.app.AppClient.register_web_url"><code class="docutils literal notranslate"><span class="pre">AppClient.register_web_url()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/app.html#hailo_ipc_sdk.app.AppClient.install_app"><code class="docutils literal notranslate"><span class="pre">AppClient.install_app()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/app.html#hailo_ipc_sdk.app.AppClient.start_app"><code class="docutils literal notranslate"><span class="pre">AppClient.start_app()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/app.html#hailo_ipc_sdk.app.AppClient.stop_app"><code class="docutils literal notranslate"><span class="pre">AppClient.stop_app()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/app.html#hailo_ipc_sdk.app.AppClient.uninstall_app"><code class="docutils literal notranslate"><span class="pre">AppClient.uninstall_app()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/app.html#hailo_ipc_sdk.app.AppClient.restart_app"><code class="docutils literal notranslate"><span class="pre">AppClient.restart_app()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/app.html#hailo_ipc_sdk.app.AppClient.list_apps"><code class="docutils literal notranslate"><span class="pre">AppClient.list_apps()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/app.html#hailo_ipc_sdk.app.AppClient.get_app"><code class="docutils literal notranslate"><span class="pre">AppClient.get_app()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/app.html#hailo_ipc_sdk.app.AppClient.get_app_stats"><code class="docutils literal notranslate"><span class="pre">AppClient.get_app_stats()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/app.html#hailo_ipc_sdk.app.AppClient.get_logs"><code class="docutils literal notranslate"><span class="pre">AppClient.get_logs()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/app.html#hailo_ipc_sdk.app.AppClient.get_logs_text"><code class="docutils literal notranslate"><span class="pre">AppClient.get_logs_text()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../api/app.html#usage-examples">Usage Examples</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../api/app.html#application-lifecycle">Application Lifecycle</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/app.html#getting-application-info">Getting Application Info</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/app.html#viewing-application-logs">Viewing Application Logs</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/app.html#registering-web-url">Registering Web URL</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/app.html#context-manager">Context Manager</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../api/plugin.html">Plugin System API</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../api/plugin.html#plugindiscovery">PluginDiscovery</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../api/plugin.html#pluginserver">PluginServer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../api/plugin.html#data-types">Data Types</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../api/plugin.html#pluginendpoint">PluginEndpoint</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../api/plugin.html#hailo_ipc_sdk.PluginEndpoint"><code class="docutils literal notranslate"><span class="pre">PluginEndpoint</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../api/plugin.html#usage-examples">Usage Examples</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../api/plugin.html#discovering-plugins">Discovering Plugins</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/plugin.html#waiting-for-plugin-ready">Waiting for Plugin Ready</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/plugin.html#listing-all-plugins">Listing All Plugins</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/plugin.html#invoking-plugin-services">Invoking Plugin Services</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/plugin.html#creating-a-plugin-server">Creating a Plugin Server</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/plugin.html#complete-plugin-example">Complete Plugin Example</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/plugin.html#plugin-dependencies">Plugin Dependencies</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/plugin.html#monitoring-plugin-changes">Monitoring Plugin Changes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/plugin.html#error-handling">Error Handling</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../api/config.html">Configuration API</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../api/config.html#config">Config</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../api/config.html#hailo_ipc_sdk.Config"><code class="docutils literal notranslate"><span class="pre">Config</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../api/config.html#hailo_ipc_sdk.Config.get_app_id"><code class="docutils literal notranslate"><span class="pre">Config.get_app_id()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/config.html#hailo_ipc_sdk.Config.get_inference_endpoint"><code class="docutils literal notranslate"><span class="pre">Config.get_inference_endpoint()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/config.html#hailo_ipc_sdk.Config.get_event_bus_endpoint"><code class="docutils literal notranslate"><span class="pre">Config.get_event_bus_endpoint()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/config.html#hailo_ipc_sdk.Config.get_device_control_endpoint"><code class="docutils literal notranslate"><span class="pre">Config.get_device_control_endpoint()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/config.html#hailo_ipc_sdk.Config.get_shm_base_path"><code class="docutils literal notranslate"><span class="pre">Config.get_shm_base_path()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/config.html#hailo_ipc_sdk.Config.get_camera_control_endpoint"><code class="docutils literal notranslate"><span class="pre">Config.get_camera_control_endpoint()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/config.html#hailo_ipc_sdk.Config.get_app_manager_endpoint"><code class="docutils literal notranslate"><span class="pre">Config.get_app_manager_endpoint()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/config.html#hailo_ipc_sdk.Config.get_encoded_socket_dir"><code class="docutils literal notranslate"><span class="pre">Config.get_encoded_socket_dir()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/config.html#hailo_ipc_sdk.Config.get_host_prefix"><code class="docutils literal notranslate"><span class="pre">Config.get_host_prefix()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/config.html#hailo_ipc_sdk.Config.translate_path_to_host"><code class="docutils literal notranslate"><span class="pre">Config.translate_path_to_host()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/config.html#hailo_ipc_sdk.Config.is_debug"><code class="docutils literal notranslate"><span class="pre">Config.is_debug()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/config.html#hailo_ipc_sdk.Config.get_log_level"><code class="docutils literal notranslate"><span class="pre">Config.get_log_level()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../api/config.html#usage-examples">Usage Examples</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../api/config.html#static-methods">Static Methods</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/config.html#environment-variable-configuration">Environment Variable Configuration</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Other</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../changelog.html">Changelog</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../changelog.html#v0-4-0-2026-07-14">v0.4.0 (2026-07-14)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../changelog.html#new-features">New Features</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../changelog.html#improvements">Improvements</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../changelog.html#v0-3-0-2026-05-18">v0.3.0 (2026-05-18)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../changelog.html#id1">New Features</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../changelog.html#id2">Improvements</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../changelog.html#bug-fixes">Bug Fixes</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../changelog.html#v0-2-0-2026-03-02">v0.2.0 (2026-03-02)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../changelog.html#id3">New Features</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../changelog.html#id4">Improvements</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../changelog.html#id5">Bug Fixes</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../changelog.html#v0-1-0-2025-12-15">v0.1.0 (2025-12-15)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../changelog.html#initial-release">Initial Release</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../contributing.html">Contributing Guide</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../contributing.html#development-environment-setup">Development Environment Setup</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../contributing.html#code-standards">Code Standards</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../contributing.html#testing">Testing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../contributing.html#submitting-code">Submitting Code</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../contributing.html#commit-message-convention">Commit Message Convention</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../contributing.html#documentation">Documentation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../contributing.html#reporting-issues">Reporting Issues</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../contributing.html#license">License</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../license.html">License</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">AIPC Platform Python SDK</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">hailo_ipc_sdk.events</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for hailo_ipc_sdk.events</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Event Bus Client</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">threading</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="kn">import</span> <span class="n">dataclass</span><span class="p">,</span> <span class="n">field</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Iterator</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">grpc</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">.proto</span><span class="w"> </span><span class="kn">import</span> <span class="n">event_pb2</span><span class="p">,</span> <span class="n">event_pb2_grpc</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_json_default</span><span class="p">(</span><span class="n">o</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Coerce numpy scalars/arrays to native Python for JSON serialization.</span>
+
+<span class="sd">    ML pipeline payloads routinely carry numpy.float32 (confidences, bbox</span>
+<span class="sd">    coords); json.dumps cannot serialize them and raises TypeError, which</span>
+<span class="sd">    crashes publish()/publish_batch() callers. Duck-typed so the SDK does</span>
+<span class="sd">    not hard-depend on numpy.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">o</span><span class="p">,</span> <span class="s2">&quot;item&quot;</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">o</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>  <span class="c1"># np.float32/np.int64 -&gt; python scalar</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="k">pass</span>
+    <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">o</span><span class="p">,</span> <span class="s2">&quot;tolist&quot;</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">o</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>  <span class="c1"># np.ndarray -&gt; list</span>
+    <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
+        <span class="sa">f</span><span class="s2">&quot;Object of type </span><span class="si">{</span><span class="n">o</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2"> is not JSON serializable&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+
+
+<div class="viewcode-block" id="Event">
+<a class="viewcode-back" href="../../api/events.html#hailo_ipc_sdk.events.Event">[docs]</a>
+<span class="nd">@dataclass</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Event</span><span class="p">:</span>
+    <span class="n">topic</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">payload</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span>
+    <span class="n">source</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
+    <span class="n">event_id</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+    <span class="n">timestamp_ns</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">metadata</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">dict</span><span class="p">)</span>
+    
+    <span class="k">def</span><span class="w"> </span><span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">source</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">source</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_app_id</span><span class="p">()</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">timestamp_ns</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">timestamp_ns</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_timestamp</span><span class="p">()</span>
+    
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_get_app_id</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+        <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">&quot;APP_ID&quot;</span><span class="p">,</span> <span class="s2">&quot;unknown&quot;</span><span class="p">)</span>
+    
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_get_timestamp</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+        <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">*</span> <span class="mf">1e9</span><span class="p">)</span>
+    
+<div class="viewcode-block" id="Event.to_json">
+<a class="viewcode-back" href="../../api/events.html#hailo_ipc_sdk.events.Event.to_json">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">to_json</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">payload</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="n">_json_default</span><span class="p">)</span></div>
+
+    
+<div class="viewcode-block" id="Event.from_proto">
+<a class="viewcode-back" href="../../api/events.html#hailo_ipc_sdk.events.Event.from_proto">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">from_proto</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">msg</span><span class="p">:</span> <span class="n">event_pb2</span><span class="o">.</span><span class="n">Event</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;Event&quot;</span><span class="p">:</span>
+        <span class="n">payload</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">if</span> <span class="n">msg</span><span class="o">.</span><span class="n">payload</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">payload</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">msg</span><span class="o">.</span><span class="n">payload</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">))</span>
+            <span class="k">except</span> <span class="n">json</span><span class="o">.</span><span class="n">JSONDecodeError</span><span class="p">:</span>
+                <span class="n">payload</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;raw&quot;</span><span class="p">:</span> <span class="n">msg</span><span class="o">.</span><span class="n">payload</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">,</span> <span class="n">errors</span><span class="o">=</span><span class="s1">&#39;replace&#39;</span><span class="p">)}</span>
+        
+        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span>
+            <span class="n">topic</span><span class="o">=</span><span class="n">msg</span><span class="o">.</span><span class="n">topic</span><span class="p">,</span>
+            <span class="n">payload</span><span class="o">=</span><span class="n">payload</span><span class="p">,</span>
+            <span class="n">source</span><span class="o">=</span><span class="n">msg</span><span class="o">.</span><span class="n">source</span><span class="p">,</span>
+            <span class="n">event_id</span><span class="o">=</span><span class="n">msg</span><span class="o">.</span><span class="n">event_id</span><span class="p">,</span>
+            <span class="n">timestamp_ns</span><span class="o">=</span><span class="n">msg</span><span class="o">.</span><span class="n">timestamp_ns</span><span class="p">,</span>
+            <span class="n">metadata</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">msg</span><span class="o">.</span><span class="n">metadata</span><span class="p">)</span>
+        <span class="p">)</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="TopicInfo">
+<a class="viewcode-back" href="../../api/events.html#hailo_ipc_sdk.events.TopicInfo">[docs]</a>
+<span class="nd">@dataclass</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">TopicInfo</span><span class="p">:</span>
+    <span class="n">topic</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">subscriber_count</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="n">total_messages</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="n">last_message_ts</span><span class="p">:</span> <span class="nb">int</span></div>
+
+
+
+<div class="viewcode-block" id="EventClient">
+<a class="viewcode-back" href="../../api/events.html#hailo_ipc_sdk.events.EventClient">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">EventClient</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Event Bus Client</span>
+
+<span class="sd">    Usage::</span>
+
+<span class="sd">        events = EventClient()</span>
+
+<span class="sd">        events.publish(&quot;app/alert&quot;, {&quot;type&quot;: &quot;person_detected&quot;})</span>
+
+<span class="sd">        for event in events.subscribe(&quot;model/*/detections&quot;):</span>
+<span class="sd">            print(f&quot;Received: {event.topic}&quot;)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    
+<div class="viewcode-block" id="EventClient.__init__">
+<a class="viewcode-back" href="../../api/events.html#hailo_ipc_sdk.events.EventClient.__init__">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">endpoint</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">endpoint</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">endpoint</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_default_endpoint</span><span class="p">()</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">endpoint</span> <span class="o">=</span> <span class="n">endpoint</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">channel</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">grpc</span><span class="o">.</span><span class="n">Channel</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">stub</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">event_pb2_grpc</span><span class="o">.</span><span class="n">EventBusStub</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">app_id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_app_id</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_subscriptions</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">threading</span><span class="o">.</span><span class="n">Thread</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_running</span> <span class="o">=</span> <span class="kc">True</span></div>
+
+    
+    <span class="k">def</span><span class="w"> </span><span class="nf">_get_default_endpoint</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+        <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">&quot;EVENT_BUS_ENDPOINT&quot;</span><span class="p">,</span> <span class="s2">&quot;unix:///run/aipc/event-bus.sock&quot;</span><span class="p">)</span>
+    
+    <span class="k">def</span><span class="w"> </span><span class="nf">_get_app_id</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+        <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">&quot;APP_ID&quot;</span><span class="p">,</span> <span class="s2">&quot;unknown&quot;</span><span class="p">)</span>
+    
+<div class="viewcode-block" id="EventClient.connect">
+<a class="viewcode-back" href="../../api/events.html#hailo_ipc_sdk.events.EventClient.connect">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">connect</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">channel</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">channel</span> <span class="o">=</span> <span class="n">grpc</span><span class="o">.</span><span class="n">insecure_channel</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">endpoint</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">stub</span> <span class="o">=</span> <span class="n">event_pb2_grpc</span><span class="o">.</span><span class="n">EventBusStub</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">channel</span><span class="p">)</span></div>
+
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">connected</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">channel</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+    
+<div class="viewcode-block" id="EventClient.close">
+<a class="viewcode-back" href="../../api/events.html#hailo_ipc_sdk.events.EventClient.close">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">close</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_running</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_subscriptions</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">t</span><span class="o">.</span><span class="n">is_alive</span><span class="p">():</span>
+                <span class="n">t</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">timeout</span><span class="o">=</span><span class="mf">1.0</span><span class="p">)</span>
+        
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">channel</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">channel</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">channel</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">stub</span> <span class="o">=</span> <span class="kc">None</span></div>
+
+    
+    <span class="k">def</span><span class="w"> </span><span class="fm">__enter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">connect</span><span class="p">()</span>
+        <span class="k">return</span> <span class="bp">self</span>
+    
+    <span class="k">def</span><span class="w"> </span><span class="fm">__exit__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">exc_type</span><span class="p">,</span> <span class="n">exc_val</span><span class="p">,</span> <span class="n">exc_tb</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+    
+<div class="viewcode-block" id="EventClient.publish">
+<a class="viewcode-back" href="../../api/events.html#hailo_ipc_sdk.events.EventClient.publish">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">publish</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> 
+                <span class="n">topic</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> 
+                <span class="n">payload</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> 
+                <span class="n">persistent</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+                <span class="n">ttl_ms</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                <span class="n">metadata</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">stub</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">connect</span><span class="p">()</span>
+        
+        <span class="n">event</span> <span class="o">=</span> <span class="n">event_pb2</span><span class="o">.</span><span class="n">Event</span><span class="p">(</span>
+            <span class="n">topic</span><span class="o">=</span><span class="n">topic</span><span class="p">,</span>
+            <span class="n">timestamp_ns</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">*</span> <span class="mf">1e9</span><span class="p">),</span>
+            <span class="n">source</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">app_id</span><span class="p">,</span>
+            <span class="n">payload</span><span class="o">=</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">payload</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="n">_json_default</span><span class="p">)</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">),</span>
+            <span class="n">payload_type</span><span class="o">=</span><span class="s2">&quot;json&quot;</span>
+        <span class="p">)</span>
+        
+        <span class="k">if</span> <span class="n">metadata</span><span class="p">:</span>
+            <span class="n">event</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">metadata</span><span class="p">)</span>
+        
+        <span class="n">request</span> <span class="o">=</span> <span class="n">event_pb2</span><span class="o">.</span><span class="n">PublishRequest</span><span class="p">(</span>
+            <span class="n">event</span><span class="o">=</span><span class="n">event</span><span class="p">,</span>
+            <span class="n">persistent</span><span class="o">=</span><span class="n">persistent</span><span class="p">,</span>
+            <span class="n">ttl_ms</span><span class="o">=</span><span class="n">ttl_ms</span> <span class="ow">or</span> <span class="mi">0</span>
+        <span class="p">)</span>
+        
+        <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">stub</span><span class="o">.</span><span class="n">Publish</span><span class="p">(</span><span class="n">request</span><span class="p">)</span>
+        
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">response</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">success</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Publish failed: </span><span class="si">{</span><span class="n">response</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">message</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        
+        <span class="k">return</span> <span class="n">response</span><span class="o">.</span><span class="n">event_id</span></div>
+
+    
+<div class="viewcode-block" id="EventClient.publish_batch">
+<a class="viewcode-back" href="../../api/events.html#hailo_ipc_sdk.events.EventClient.publish_batch">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">publish_batch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">events</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]],</span> <span class="n">persistent</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">stub</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">connect</span><span class="p">()</span>
+        
+        <span class="k">def</span><span class="w"> </span><span class="nf">generate_requests</span><span class="p">():</span>
+            <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">events</span><span class="p">:</span>
+                <span class="n">event</span> <span class="o">=</span> <span class="n">event_pb2</span><span class="o">.</span><span class="n">Event</span><span class="p">(</span>
+                    <span class="n">topic</span><span class="o">=</span><span class="n">e</span><span class="p">[</span><span class="s2">&quot;topic&quot;</span><span class="p">],</span>
+                    <span class="n">timestamp_ns</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">*</span> <span class="mf">1e9</span><span class="p">),</span>
+                    <span class="n">source</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">app_id</span><span class="p">,</span>
+                    <span class="n">payload</span><span class="o">=</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">e</span><span class="p">[</span><span class="s2">&quot;payload&quot;</span><span class="p">],</span> <span class="n">default</span><span class="o">=</span><span class="n">_json_default</span><span class="p">)</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">),</span>
+                    <span class="n">payload_type</span><span class="o">=</span><span class="s2">&quot;json&quot;</span>
+                <span class="p">)</span>
+                <span class="k">yield</span> <span class="n">event_pb2</span><span class="o">.</span><span class="n">PublishRequest</span><span class="p">(</span><span class="n">event</span><span class="o">=</span><span class="n">event</span><span class="p">,</span> <span class="n">persistent</span><span class="o">=</span><span class="n">persistent</span><span class="p">)</span>
+        
+        <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">stub</span><span class="o">.</span><span class="n">PublishBatch</span><span class="p">(</span><span class="n">generate_requests</span><span class="p">())</span>
+        
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">response</span><span class="o">.</span><span class="n">success</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Batch publish failed: </span><span class="si">{</span><span class="n">response</span><span class="o">.</span><span class="n">message</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
+
+    
+<div class="viewcode-block" id="EventClient.subscribe">
+<a class="viewcode-back" href="../../api/events.html#hailo_ipc_sdk.events.EventClient.subscribe">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">subscribe</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> 
+                  <span class="n">topic</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+                  <span class="n">filters</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                  <span class="n">queue_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">100</span><span class="p">,</span>
+                  <span class="n">drop_old</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="n">Event</span><span class="p">]:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">stub</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">connect</span><span class="p">()</span>
+        
+        <span class="n">request</span> <span class="o">=</span> <span class="n">event_pb2</span><span class="o">.</span><span class="n">SubscribeRequest</span><span class="p">(</span>
+            <span class="n">topic</span><span class="o">=</span><span class="n">topic</span><span class="p">,</span>
+            <span class="n">subscriber_id</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">app_id</span><span class="p">,</span>
+            <span class="n">queue_size</span><span class="o">=</span><span class="n">queue_size</span><span class="p">,</span>
+            <span class="n">drop_old</span><span class="o">=</span><span class="n">drop_old</span>
+        <span class="p">)</span>
+        
+        <span class="k">if</span> <span class="n">filters</span><span class="p">:</span>
+            <span class="n">request</span><span class="o">.</span><span class="n">filters</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">filters</span><span class="p">)</span>
+        
+        <span class="k">for</span> <span class="n">event_msg</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">stub</span><span class="o">.</span><span class="n">Subscribe</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+            <span class="k">yield</span> <span class="n">Event</span><span class="o">.</span><span class="n">from_proto</span><span class="p">(</span><span class="n">event_msg</span><span class="p">)</span></div>
+
+    
+<div class="viewcode-block" id="EventClient.on_event">
+<a class="viewcode-back" href="../../api/events.html#hailo_ipc_sdk.events.EventClient.on_event">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">on_event</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> 
+                 <span class="n">topic</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+                 <span class="n">callback</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">Event</span><span class="p">],</span> <span class="kc">None</span><span class="p">],</span>
+                 <span class="n">filters</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">threading</span><span class="o">.</span><span class="n">Thread</span><span class="p">:</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">_subscribe_thread</span><span class="p">():</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">event</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">subscribe</span><span class="p">(</span><span class="n">topic</span><span class="p">,</span> <span class="n">filters</span><span class="p">):</span>
+                    <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_running</span><span class="p">:</span>
+                        <span class="k">break</span>
+                    <span class="k">try</span><span class="p">:</span>
+                        <span class="n">callback</span><span class="p">(</span><span class="n">event</span><span class="p">)</span>
+                    <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+                        <span class="k">pass</span>
+            <span class="k">except</span> <span class="n">grpc</span><span class="o">.</span><span class="n">RpcError</span><span class="p">:</span>
+                <span class="k">pass</span>
+        
+        <span class="n">thread</span> <span class="o">=</span> <span class="n">threading</span><span class="o">.</span><span class="n">Thread</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="n">_subscribe_thread</span><span class="p">,</span> <span class="n">daemon</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">thread</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_subscriptions</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">thread</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">thread</span></div>
+
+    
+<div class="viewcode-block" id="EventClient.unsubscribe">
+<a class="viewcode-back" href="../../api/events.html#hailo_ipc_sdk.events.EventClient.unsubscribe">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">unsubscribe</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">topic</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">stub</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">connect</span><span class="p">()</span>
+        
+        <span class="n">request</span> <span class="o">=</span> <span class="n">event_pb2</span><span class="o">.</span><span class="n">SubscribeRequest</span><span class="p">(</span><span class="n">topic</span><span class="o">=</span><span class="n">topic</span><span class="p">,</span> <span class="n">subscriber_id</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">app_id</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">stub</span><span class="o">.</span><span class="n">Unsubscribe</span><span class="p">(</span><span class="n">request</span><span class="p">)</span></div>
+
+    
+<div class="viewcode-block" id="EventClient.list_topics">
+<a class="viewcode-back" href="../../api/events.html#hailo_ipc_sdk.events.EventClient.list_topics">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">list_topics</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">TopicInfo</span><span class="p">]:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">stub</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">connect</span><span class="p">()</span>
+        
+        <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">stub</span><span class="o">.</span><span class="n">ListTopics</span><span class="p">(</span><span class="n">event_pb2</span><span class="o">.</span><span class="n">Empty</span><span class="p">())</span>
+        
+        <span class="k">return</span> <span class="p">[</span>
+            <span class="n">TopicInfo</span><span class="p">(</span>
+                <span class="n">topic</span><span class="o">=</span><span class="n">t</span><span class="o">.</span><span class="n">topic</span><span class="p">,</span>
+                <span class="n">subscriber_count</span><span class="o">=</span><span class="n">t</span><span class="o">.</span><span class="n">subscriber_count</span><span class="p">,</span>
+                <span class="n">total_messages</span><span class="o">=</span><span class="n">t</span><span class="o">.</span><span class="n">total_messages</span><span class="p">,</span>
+                <span class="n">last_message_ts</span><span class="o">=</span><span class="n">t</span><span class="o">.</span><span class="n">last_message_ts</span>
+            <span class="p">)</span>
+            <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">response</span><span class="o">.</span><span class="n">topics</span>
+        <span class="p">]</span></div>
+
+    
+<div class="viewcode-block" id="EventClient.get_topic_info">
+<a class="viewcode-back" href="../../api/events.html#hailo_ipc_sdk.events.EventClient.get_topic_info">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_topic_info</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">topic</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">TopicInfo</span><span class="p">]:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">stub</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">connect</span><span class="p">()</span>
+        
+        <span class="n">request</span> <span class="o">=</span> <span class="n">event_pb2</span><span class="o">.</span><span class="n">TopicInfo</span><span class="p">(</span><span class="n">topic</span><span class="o">=</span><span class="n">topic</span><span class="p">)</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">stub</span><span class="o">.</span><span class="n">GetTopicInfo</span><span class="p">(</span><span class="n">request</span><span class="p">)</span>
+        
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">response</span><span class="o">.</span><span class="n">topic</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span>
+        
+        <span class="k">return</span> <span class="n">TopicInfo</span><span class="p">(</span>
+            <span class="n">topic</span><span class="o">=</span><span class="n">response</span><span class="o">.</span><span class="n">topic</span><span class="p">,</span>
+            <span class="n">subscriber_count</span><span class="o">=</span><span class="n">response</span><span class="o">.</span><span class="n">subscriber_count</span><span class="p">,</span>
+            <span class="n">total_messages</span><span class="o">=</span><span class="n">response</span><span class="o">.</span><span class="n">total_messages</span><span class="p">,</span>
+            <span class="n">last_message_ts</span><span class="o">=</span><span class="n">response</span><span class="o">.</span><span class="n">last_message_ts</span>
+        <span class="p">)</span></div>
+
+    
+<div class="viewcode-block" id="EventClient.get_stats">
+<a class="viewcode-back" href="../../api/events.html#hailo_ipc_sdk.events.EventClient.get_stats">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_stats</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">stub</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">connect</span><span class="p">()</span>
+        
+        <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">stub</span><span class="o">.</span><span class="n">GetStats</span><span class="p">(</span><span class="n">event_pb2</span><span class="o">.</span><span class="n">Empty</span><span class="p">())</span>
+        
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="s2">&quot;total_subscribers&quot;</span><span class="p">:</span> <span class="n">response</span><span class="o">.</span><span class="n">total_subscribers</span><span class="p">,</span>
+            <span class="s2">&quot;total_topics&quot;</span><span class="p">:</span> <span class="n">response</span><span class="o">.</span><span class="n">total_topics</span><span class="p">,</span>
+            <span class="s2">&quot;uptime_ms&quot;</span><span class="p">:</span> <span class="n">response</span><span class="o">.</span><span class="n">uptime_ms</span><span class="p">,</span>
+            <span class="s2">&quot;topic_stats&quot;</span><span class="p">:</span> <span class="p">[</span>
+                <span class="p">{</span>
+                    <span class="s2">&quot;topic&quot;</span><span class="p">:</span> <span class="n">s</span><span class="o">.</span><span class="n">topic</span><span class="p">,</span>
+                    <span class="s2">&quot;published_count&quot;</span><span class="p">:</span> <span class="n">s</span><span class="o">.</span><span class="n">published_count</span><span class="p">,</span>
+                    <span class="s2">&quot;delivered_count&quot;</span><span class="p">:</span> <span class="n">s</span><span class="o">.</span><span class="n">delivered_count</span><span class="p">,</span>
+                    <span class="s2">&quot;dropped_count&quot;</span><span class="p">:</span> <span class="n">s</span><span class="o">.</span><span class="n">dropped_count</span><span class="p">,</span>
+                    <span class="s2">&quot;avg_latency_us&quot;</span><span class="p">:</span> <span class="n">s</span><span class="o">.</span><span class="n">avg_latency_us</span>
+                <span class="p">}</span>
+                <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">response</span><span class="o">.</span><span class="n">topic_stats</span>
+            <span class="p">]</span>
+        <span class="p">}</span></div>
+
+    
+<div class="viewcode-block" id="EventClient.get_topic_stats">
+<a class="viewcode-back" href="../../api/events.html#hailo_ipc_sdk.events.EventClient.get_topic_stats">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_topic_stats</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">topic</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">stub</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">connect</span><span class="p">()</span>
+        
+        <span class="n">request</span> <span class="o">=</span> <span class="n">event_pb2</span><span class="o">.</span><span class="n">TopicInfo</span><span class="p">(</span><span class="n">topic</span><span class="o">=</span><span class="n">topic</span><span class="p">)</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">stub</span><span class="o">.</span><span class="n">GetTopicStats</span><span class="p">(</span><span class="n">request</span><span class="p">)</span>
+        
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="s2">&quot;topic&quot;</span><span class="p">:</span> <span class="n">response</span><span class="o">.</span><span class="n">topic</span><span class="p">,</span>
+            <span class="s2">&quot;published_count&quot;</span><span class="p">:</span> <span class="n">response</span><span class="o">.</span><span class="n">published_count</span><span class="p">,</span>
+            <span class="s2">&quot;delivered_count&quot;</span><span class="p">:</span> <span class="n">response</span><span class="o">.</span><span class="n">delivered_count</span><span class="p">,</span>
+            <span class="s2">&quot;dropped_count&quot;</span><span class="p">:</span> <span class="n">response</span><span class="o">.</span><span class="n">dropped_count</span><span class="p">,</span>
+            <span class="s2">&quot;avg_latency_us&quot;</span><span class="p">:</span> <span class="n">response</span><span class="o">.</span><span class="n">avg_latency_us</span>
+        <span class="p">}</span></div>
+</div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2026, AIPC Platform Team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

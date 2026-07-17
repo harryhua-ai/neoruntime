@@ -15,6 +15,8 @@ PKG_NAME = aipc-$(HAL_PLATFORM)-$(VERSION)
 STAGE_DIR = $(RELEASE_DIR)/$(PKG_NAME)
 TARBALL = $(RELEASE_DIR)/$(PKG_NAME).tar.gz
 SDK_PATH ?= $(or $(HAILO_SDK_PATH),/opt/hailo-sdk)
+RECOVERY_BUNDLE_DIR ?= build/recovery/hailo15-ne503
+RECOVERY_VERSION ?= 1.0.1
 DOCKER_RELEASE_IMAGE ?= zerobot/ne503-dev-env-full:4.0.23
 DOCKER_RELEASE_WORKDIR ?= /ne503
 DOCKER_RELEASE_SDK_PATH ?= /opt/hailo-sdk
@@ -26,6 +28,7 @@ AIPC_DATA_SCHEMA ?= 1
 AIPC_MACHINE ?= hailo15-ne503
 AIPC_PRODUCT ?= ne503
 SKIP_STAGE_TARBALL ?= 0
+BUILD_MCU_FW ?= 0
 HAL_PLATFORM ?= stub
 GO ?= go
 GO_BUILD_FLAGS ?= -v -mod=mod
@@ -39,6 +42,7 @@ PROTO_GO_PLUGIN := --go_out=. --go_opt=paths=source_relative --go-grpc_out=. --g
 PROTOC_OPT := --experimental_allow_proto3_optional
 CMAKE_TARGET_ARGS := -DCMAKE_BUILD_TYPE=$(CMAKE_BUILD_TYPE)
 SYSROOT_ENV :=
+HAL_V2_BUILD_DIR := hal_v2/build-$(HAL_PLATFORM)
 
 ifeq ($(HAL_PLATFORM),hailo15)
 AIPC_GO_ENV := GOCACHE=$(GO_CACHE_DIR) CGO_ENABLED=0 GOOS=linux GOARCH=arm64
@@ -97,11 +101,11 @@ proto-discovery:
 
 hal-v2:
 	@echo "==> Building HAL v2 [platform=$(HAL_PLATFORM)]"
-	@mkdir -p hal_v2/build-$(HAL_PLATFORM)
-	cd hal_v2/build-$(HAL_PLATFORM) && $(SYSROOT_ENV) $(CMAKE) $(CMAKE_TARGET_ARGS) -DHAL_PLATFORM=$(HAL_PLATFORM) ..
-	cd hal_v2/build-$(HAL_PLATFORM) && $(SYSROOT_ENV) $(MAKE) -j$$(nproc)
+	@mkdir -p $(HAL_V2_BUILD_DIR)
+	cd $(HAL_V2_BUILD_DIR) && $(SYSROOT_ENV) $(CMAKE) $(CMAKE_TARGET_ARGS) -DHAL_PLATFORM=$(HAL_PLATFORM) ..
+	cd $(HAL_V2_BUILD_DIR) && $(SYSROOT_ENV) $(MAKE) -j$$(nproc)
 	@mkdir -p $(BUILD_DIR)/hal/$(HAL_PLATFORM)
-	@cp -P hal_v2/build-$(HAL_PLATFORM)/libaipc_hal*.so* hal_v2/build-$(HAL_PLATFORM)/libhal-*.so* $(BUILD_DIR)/hal/$(HAL_PLATFORM)/ 2>/dev/null || true
+	@cp -P $(HAL_V2_BUILD_DIR)/libaipc_hal*.so* $(HAL_V2_BUILD_DIR)/libhal-*.so* $(BUILD_DIR)/hal/$(HAL_PLATFORM)/ 2>/dev/null || true
 
 platform: device-control event-bus app-manager platform-api device-discovery os-updater
 
@@ -149,9 +153,10 @@ aipc-cli:
 	$(AIPC_GO_ENV) $(GO) build $(GO_BUILD_FLAGS) -o $(CURDIR)/$(BUILD_DIR)/aipc-cli ./tools/aipc-cli
 
 tools:
-	@mkdir -p tools/shm-reader/build-$(HAL_PLATFORM) tools/nv12-to-jpeg/build-$(HAL_PLATFORM)
+	@echo "==> Building tools (shm-reader, nv12-to-jpeg)"
+	@mkdir -p tools/shm-reader/build-$(HAL_PLATFORM)
 	cd tools/shm-reader/build-$(HAL_PLATFORM) && $(SYSROOT_ENV) $(CMAKE) $(CMAKE_TARGET_ARGS) .. && $(SYSROOT_ENV) $(MAKE) -j$$(nproc)
-	cd tools/nv12-to-jpeg/build-$(HAL_PLATFORM) && $(SYSROOT_ENV) $(CMAKE) $(CMAKE_TARGET_ARGS) .. && $(SYSROOT_ENV) $(MAKE) -j$$(nproc)
+	cp tools/shm-reader/build-$(HAL_PLATFORM)/shm-reader tools/shm-reader/build-$(HAL_PLATFORM)/nv12-to-jpeg $(BUILD_DIR)/ 2>/dev/null || true
 
 docker-pack-release:
 	@echo "==> Building Hailo-15 release package in Docker"
@@ -182,7 +187,7 @@ docker-pack-release:
 			pnpm -v; \
 			make pack-release SDK_PATH="$$SDK_PATH" HAILO_SDK_PATH="$$HAILO_SDK_PATH" VERSION="$(VERSION)" BUILD_MCU_FW="$(BUILD_MCU_FW)"'
 
-pack: all web
+pack: all tools web
 	$(MAKE) _pack-stage HAL_PLATFORM="$(HAL_PLATFORM)" VERSION="$(VERSION)"
 
 pack-release:
@@ -190,7 +195,12 @@ pack-release:
 		echo "ERROR: SDK not found at $(SDK_PATH). Set SDK_PATH=/path/to/poky-sdk or HAILO_SDK_PATH."; \
 		exit 1; \
 	fi
-	$(MAKE) all web HAL_PLATFORM=hailo15 SDK_PATH="$(SDK_PATH)" VERSION="$(VERSION)"
+	@if [ "$(BUILD_MCU_FW)" = "1" ]; then \
+		echo "ERROR: BUILD_MCU_FW is not available in this public snapshot."; \
+		echo "       Commit prebuilt OTA packages under mcu_board_prj/firmware instead."; \
+		exit 1; \
+	fi
+	$(MAKE) all tools web HAL_PLATFORM=hailo15 SDK_PATH="$(SDK_PATH)" VERSION="$(VERSION)"
 	$(MAKE) _pack-internal HAL_PLATFORM=hailo15 SDK_PATH="$(SDK_PATH)" VERSION="$(VERSION)"
 
 _pack-stage:
@@ -205,12 +215,19 @@ _pack-stage:
 		echo "       Run 'make all' before packaging."; \
 		exit 1; \
 	fi
+	@for helper in scripts/aipc-install-current-root.sh scripts/aipc-compat-check.sh systemd/aipc-platform.target; do \
+		if [ ! -f "$$helper" ]; then \
+			echo "ERROR: missing required release helper $$helper"; \
+			exit 1; \
+		fi; \
+	done
 	@rm -rf "$(STAGE_DIR)" "$(TARBALL)"
 	@mkdir -p "$(STAGE_DIR)/opt/aipc/bin" \
 		"$(STAGE_DIR)/opt/aipc/libexec" \
 		"$(STAGE_DIR)/opt/aipc/lib/hal" \
 		"$(STAGE_DIR)/opt/aipc/etc/security" \
 		"$(STAGE_DIR)/opt/aipc/scripts" \
+		"$(STAGE_DIR)/opt/aipc/recovery" \
 		"$(STAGE_DIR)/opt/aipc/web" \
 		"$(STAGE_DIR)/opt/aipc/swagger-ui" \
 		"$(STAGE_DIR)/opt/aipc/models" \
@@ -220,21 +237,69 @@ _pack-stage:
 		echo "  + $$f"; \
 	done
 	@cp "$(BUILD_DIR)/aipc-os-updater" "$(STAGE_DIR)/opt/aipc/libexec/" && echo "  + aipc-os-updater"
+	@if [ "$(HAL_PLATFORM)" = "hailo15" ]; then \
+		if [ -f "$(RECOVERY_BUNDLE_DIR)/manifest.json" ] && [ -f "$(RECOVERY_BUNDLE_DIR)/fitImage" ] && [ -f "$(RECOVERY_BUNDLE_DIR)/swupdate-image-hailo15-ne503.ext4.gz" ]; then \
+			cp -f "$(RECOVERY_BUNDLE_DIR)/manifest.json" "$(RECOVERY_BUNDLE_DIR)/fitImage" "$(RECOVERY_BUNDLE_DIR)/swupdate-image-hailo15-ne503.ext4.gz" "$(STAGE_DIR)/opt/aipc/recovery/"; \
+			echo "  + bundled single-copy Recovery $(RECOVERY_VERSION)"; \
+		else \
+			echo "  - recovery bundle not found at $(RECOVERY_BUNDLE_DIR)"; \
+		fi; \
+	fi
+	@for f in shm-reader nv12-to-jpeg; do \
+		[ -f "$(BUILD_DIR)/$$f" ] && cp "$(BUILD_DIR)/$$f" "$(STAGE_DIR)/opt/aipc/bin/" && echo "  + $$f"; \
+	done
+	@[ -f tools/shm-reader/shm_viewer.py ] && cp tools/shm-reader/shm_viewer.py "$(STAGE_DIR)/opt/aipc/bin/" || true
 	@cp -P $(BUILD_DIR)/hal/$(HAL_PLATFORM)/libaipc_hal*.so* $(BUILD_DIR)/hal/$(HAL_PLATFORM)/libhal-*.so* "$(STAGE_DIR)/opt/aipc/lib/hal/" 2>/dev/null || true
 	@cp -f configs/platform/*.yaml "$(STAGE_DIR)/opt/aipc/etc/" 2>/dev/null || true
 	@cp -f configs/ai/*.yaml "$(STAGE_DIR)/opt/aipc/etc/" 2>/dev/null || true
 	@cp -f configs/platform-api.yaml "$(STAGE_DIR)/opt/aipc/etc/" 2>/dev/null || true
 	@cp -f configs/security/seccomp-default.json "$(STAGE_DIR)/opt/aipc/etc/security/" 2>/dev/null || true
+	@mkdir -p "$(STAGE_DIR)/opt/aipc/etc/systemd/system.conf.d" \
+		"$(STAGE_DIR)/opt/aipc/etc/systemd/journald.conf.d" \
+		"$(STAGE_DIR)/opt/aipc/etc/sysctl.d"
+	@cp -f configs/systemd/*.conf "$(STAGE_DIR)/opt/aipc/etc/systemd/system.conf.d/" 2>/dev/null || true
+	@cp -f configs/systemd/journald.conf.d/*.conf "$(STAGE_DIR)/opt/aipc/etc/systemd/journald.conf.d/" 2>/dev/null || true
+	@cp -f configs/system/sysctl.d/*.conf "$(STAGE_DIR)/opt/aipc/etc/sysctl.d/" 2>/dev/null || true
 	@for unit in systemd/*.service systemd/*.timer systemd/*.target; do \
 		[ -f "$$unit" ] || continue; \
 		install -m 0644 "$$unit" "$(STAGE_DIR)/systemd/"; \
 	done
 	@cp -f scripts/deploy.sh "$(STAGE_DIR)/deploy.sh" 2>/dev/null && chmod +x "$(STAGE_DIR)/deploy.sh" || true
-	@for script in aipc-install-current-root.sh aipc-compat-check.sh aipc-firstboot.sh aipc-restore.sh aipc-firstboot-os.sh aipc-autostart.sh aipc-osd-apply.sh aipc-healthmon.sh aipc-logrotate.sh aipc-os-layout-check.sh aipc-mcu-prep.sh download_models.sh; do \
-		[ -f "scripts/$$script" ] || continue; \
-		cp -f "scripts/$$script" "$(STAGE_DIR)/opt/aipc/scripts/"; \
-		chmod +x "$(STAGE_DIR)/opt/aipc/scripts/$$script"; \
-	done
+	@install -m 0755 scripts/aipc-install-current-root.sh "$(STAGE_DIR)/opt/aipc/scripts/aipc-install-current-root.sh"
+	@cp -f scripts/aipc-firstboot.sh "$(STAGE_DIR)/opt/aipc/scripts/aipc-firstboot.sh" 2>/dev/null && chmod +x "$(STAGE_DIR)/opt/aipc/scripts/aipc-firstboot.sh" || true
+	@cp -f scripts/aipc-healthmon.sh "$(STAGE_DIR)/opt/aipc/scripts/aipc-healthmon.sh" 2>/dev/null && chmod +x "$(STAGE_DIR)/opt/aipc/scripts/aipc-healthmon.sh" || true
+	@cp -f scripts/aipc-logrotate.sh "$(STAGE_DIR)/opt/aipc/scripts/aipc-logrotate.sh" 2>/dev/null && chmod +x "$(STAGE_DIR)/opt/aipc/scripts/aipc-logrotate.sh" || true
+	@cp -f scripts/aipc-os-layout-check.sh "$(STAGE_DIR)/opt/aipc/scripts/aipc-os-layout-check.sh" 2>/dev/null && chmod +x "$(STAGE_DIR)/opt/aipc/scripts/aipc-os-layout-check.sh" || true
+	@cp -f scripts/aipc-restore.sh "$(STAGE_DIR)/opt/aipc/libexec/aipc-restore" 2>/dev/null && chmod +x "$(STAGE_DIR)/opt/aipc/libexec/aipc-restore" || true
+	@cp -f scripts/aipc-firstboot-os.sh "$(STAGE_DIR)/opt/aipc/libexec/aipc-firstboot" 2>/dev/null && chmod +x "$(STAGE_DIR)/opt/aipc/libexec/aipc-firstboot" || true
+	@cp -f scripts/aipc-autostart.sh "$(STAGE_DIR)/opt/aipc/libexec/aipc-autostart" 2>/dev/null && chmod +x "$(STAGE_DIR)/opt/aipc/libexec/aipc-autostart" || true
+	@cp -f scripts/aipc-compat-check.sh "$(STAGE_DIR)/opt/aipc/libexec/aipc-compat-check" 2>/dev/null && chmod +x "$(STAGE_DIR)/opt/aipc/libexec/aipc-compat-check" || true
+	@cp -f scripts/aipc-osd-apply.sh "$(STAGE_DIR)/opt/aipc/libexec/aipc-osd-apply" 2>/dev/null && chmod +x "$(STAGE_DIR)/opt/aipc/libexec/aipc-osd-apply" || true
+	@cp -f scripts/aipc-mcu-prep.sh "$(STAGE_DIR)/opt/aipc/bin/aipc-mcu-prep.sh" 2>/dev/null && chmod +x "$(STAGE_DIR)/opt/aipc/bin/aipc-mcu-prep.sh" || true
+	@if [ -x "$(HAL_V2_BUILD_DIR)/ne503_boot_prep" ]; then cp -f "$(HAL_V2_BUILD_DIR)/ne503_boot_prep" "$(STAGE_DIR)/opt/aipc/bin/" && echo "  + ne503_boot_prep (from $(HAL_V2_BUILD_DIR))"; \
+	elif [ -x hal_v2/examples/ne503_boot_prep/build-standalone/ne503_boot_prep ]; then cp -f hal_v2/examples/ne503_boot_prep/build-standalone/ne503_boot_prep "$(STAGE_DIR)/opt/aipc/bin/" && echo "  + ne503_boot_prep (standalone)"; \
+	elif [ -x tools/ne503_boot_prep ]; then cp -f tools/ne503_boot_prep "$(STAGE_DIR)/opt/aipc/bin/" && echo "  + ne503_boot_prep (tools/ copy)"; \
+	else echo "  - ne503_boot_prep not built"; fi
+	@mkdir -p "$(STAGE_DIR)/opt/aipc/firmware/mcu"
+	@found=0; \
+	for dir in mcu_board_prj/firmware firmware/mcu; do \
+		for f in "$$dir"/ne503_ota_package_*.bin; do \
+			[ -f "$$f" ] || continue; \
+			cp -f "$$f" "$(STAGE_DIR)/opt/aipc/firmware/mcu/"; \
+			echo "  + mcu fw: $$(basename "$$f") (from $$dir)"; \
+			found=1; \
+		done; \
+	done; \
+	[ "$$found" -eq 1 ] || echo "  - mcu fw: no ne503_ota_package_*.bin found"
+	@mkdir -p "$(STAGE_DIR)/opt/aipc/docs" "$(STAGE_DIR)/opt/aipc/share/calibration"
+	@cp -f docs/baseboard-mcu-rtc-ota.md "$(STAGE_DIR)/opt/aipc/docs/" 2>/dev/null || true
+	@cp -f configs/calibration/final_calibration.json "$(STAGE_DIR)/opt/aipc/share/calibration/final_calibration.json" 2>/dev/null && echo "  + imu calibration" || echo "  - imu calibration missing"
+	@cp -f scripts/download_models.sh "$(STAGE_DIR)/opt/aipc/bin/download_models.sh" 2>/dev/null && chmod +x "$(STAGE_DIR)/opt/aipc/bin/download_models.sh" || true
+	@if [ -d sdk/python/docs/en/_build/html ]; then \
+		mkdir -p "$(STAGE_DIR)/opt/aipc/web/docs"; \
+		cp -r sdk/python/docs/en/_build/html/* "$(STAGE_DIR)/opt/aipc/web/docs/"; \
+		echo "  + SDK docs"; \
+	fi
 	@[ -d web/dist ] && cp -r web/dist/* "$(STAGE_DIR)/opt/aipc/web/" && echo "  + web console" || true
 	@cp -f platform/platform-api/swagger-ui/* "$(STAGE_DIR)/opt/aipc/swagger-ui/" 2>/dev/null || true
 	@cp -f docs/api/swagger.yaml "$(STAGE_DIR)/opt/aipc/etc/swagger.yaml" 2>/dev/null || true
