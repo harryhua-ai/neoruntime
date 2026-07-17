@@ -250,9 +250,13 @@ _pack-stage:
 	done
 	@[ -f tools/shm-reader/shm_viewer.py ] && cp tools/shm-reader/shm_viewer.py "$(STAGE_DIR)/opt/aipc/bin/" || true
 	@cp -P $(BUILD_DIR)/hal/$(HAL_PLATFORM)/libaipc_hal*.so* $(BUILD_DIR)/hal/$(HAL_PLATFORM)/libhal-*.so* "$(STAGE_DIR)/opt/aipc/lib/hal/" 2>/dev/null || true
-	@cp -f configs/platform/*.yaml "$(STAGE_DIR)/opt/aipc/etc/" 2>/dev/null || true
-	@cp -f configs/ai/*.yaml "$(STAGE_DIR)/opt/aipc/etc/" 2>/dev/null || true
+	@cp -f configs/platform/camera-daemon.yaml "$(STAGE_DIR)/opt/aipc/etc/" 2>/dev/null || true
+	@cp -f configs/ai/ai-runtime.yaml "$(STAGE_DIR)/opt/aipc/etc/" 2>/dev/null || true
+	@cp -f configs/platform/event-bus.yaml "$(STAGE_DIR)/opt/aipc/etc/" 2>/dev/null || true
+	@cp -f configs/platform/app-manager.yaml "$(STAGE_DIR)/opt/aipc/etc/" 2>/dev/null || true
+	@cp -f configs/platform/device-control.yaml "$(STAGE_DIR)/opt/aipc/etc/" 2>/dev/null || true
 	@cp -f configs/platform-api.yaml "$(STAGE_DIR)/opt/aipc/etc/" 2>/dev/null || true
+	@cp -f configs/platform/discovery.yaml "$(STAGE_DIR)/opt/aipc/etc/" 2>/dev/null || true
 	@cp -f configs/security/seccomp-default.json "$(STAGE_DIR)/opt/aipc/etc/security/" 2>/dev/null || true
 	@mkdir -p "$(STAGE_DIR)/opt/aipc/etc/systemd/system.conf.d" \
 		"$(STAGE_DIR)/opt/aipc/etc/systemd/journald.conf.d" \
