@@ -104,6 +104,7 @@ hal-v2:
 	@mkdir -p $(HAL_V2_BUILD_DIR)
 	cd $(HAL_V2_BUILD_DIR) && $(SYSROOT_ENV) $(CMAKE) $(CMAKE_TARGET_ARGS) -DHAL_PLATFORM=$(HAL_PLATFORM) ..
 	cd $(HAL_V2_BUILD_DIR) && $(SYSROOT_ENV) $(MAKE) -j$$(nproc)
+	@rm -rf $(BUILD_DIR)/hal/$(HAL_PLATFORM)
 	@mkdir -p $(BUILD_DIR)/hal/$(HAL_PLATFORM)
 	@cp -P $(HAL_V2_BUILD_DIR)/libaipc_hal*.so* $(HAL_V2_BUILD_DIR)/libhal-*.so* $(BUILD_DIR)/hal/$(HAL_PLATFORM)/ 2>/dev/null || true
 
