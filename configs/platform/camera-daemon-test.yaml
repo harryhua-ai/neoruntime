@@ -1,0 +1,18 @@
+# camera-daemon test configuration (stub HAL)
+# Usage: camera-daemon -c configs/platform/camera-daemon-test.yaml
+
+hal:
+  video_library: /path/to/ne503/build/hal-stub/libhal-stub.so
+  codec_library: /path/to/ne503/build/hal-stub/libhal-stub.so
+  osd_library: /path/to/ne503/build/hal-stub/libhal-stub.so
+
+video:
+  device_path: /dev/video0
+
+watchdog:
+  scan_interval_ms: 100
+  frame_timeout_ms: 500
+  warn_threshold_ms: 300
+
+service:
+  log_level: debug

@@ -1,0 +1,292 @@
+software =
+{
+	version = "1.11.0";
+	product = "ne503";
+	aipc-compat-level = "1";
+	data-schema = "1";
+	description = "Firmware update for Hailo SoC";
+	hardware-compatibility: [ "1.0"];
+	embedded-script = "
+-- set default parameters
+vars = {
+    FILESYSTEM_DEVICE = 'mmcblk1',
+    FIRMWARE_DEVICE = 'mtdblock0',
+    FW_ENV_DEVICE = 'mtd0'
+}
+
+-- override parameters with config file
+local cfg = io.open('/tmp/swupdate.cfg', 'r')
+if cfg then
+	for line in cfg:lines() do
+		local sep = line:find('=')
+		if sep then
+			vars[line:sub(1, sep - 1)] = line:sub(sep + 1)
+		end
+    end
+    cfg:close()
+end
+
+-- formatting function to replace '${key}' with the parameter from vars[key]
+function format(str)
+	return (str:gsub('%${(.-)}', function(key)
+		return vars[key]
+	end))
+end
+
+-- hook functions for using templated fields
+function format_device(elem)
+	elem.device = format(elem.device)
+	return true, elem
+end
+
+function format_data(elem)
+	elem.data = format(elem.data)
+	return true, elem
+end
+
+";
+	stable = {
+		copy-a: {
+			images: (
+				{
+					filename = "core-image-minimal-hailo15-ne503.ext4.gz";
+					device = "/dev/${FILESYSTEM_DEVICE}p2";
+					hook = "format_device";
+					installed-directly = true;
+					compressed = "zlib";
+				},
+				{
+					filename = "hailo15_scu_fw.bin";
+					device = "/dev/${FIRMWARE_DEVICE}";
+					hook = "format_device";
+					offset = "0x8000";
+				},
+				{
+					filename = "u-boot.dtb.signed";
+					device = "/dev/${FIRMWARE_DEVICE}";
+					hook = "format_device";
+					offset = "0x40000";
+				},
+				{
+					filename = "customer_certificate.bin";
+					device = "/dev/${FIRMWARE_DEVICE}";
+					hook = "format_device";
+					offset = "0x4F000";
+				},
+				{
+					filename = "u-boot-initial-env.bin";
+					device = "/dev/${FIRMWARE_DEVICE}";
+					hook = "format_device";
+					offset = "0x50000";
+				},
+				{
+					filename = "u-boot-spl.bin";
+					device = "/dev/${FIRMWARE_DEVICE}";
+					hook = "format_device";
+					offset = "0x54000";
+				},
+			);
+			files: (
+				{
+					filename = "fitImage";
+					path = "/fitImage";
+					device = "/dev/${FILESYSTEM_DEVICE}p1";
+					hook = "format_device";
+					filesystem = "vfat";
+				},
+				{
+					filename = "swupdate-image-hailo15-ne503.ext4.gz";
+					path = "/swupdate-image-hailo15-ne503.ext4.gz";
+					device = "/dev/${FILESYSTEM_DEVICE}p1";
+					hook = "format_device";
+					filesystem = "vfat";
+				},
+				{
+					filename = "u-boot-tfa.itb";
+					path = "/u-boot-tfa.itb";
+					device = "/dev/${FILESYSTEM_DEVICE}p1";
+					hook = "format_device";
+					filesystem = "vfat";
+				},
+			);
+			scripts: (
+				{
+					filename = "resize_fs.sh";
+					type = "postinstall";
+					data = "/dev/${FILESYSTEM_DEVICE}p2";
+					hook = "format_data";
+				},
+				{
+					filename = "update_fw_env.sh";
+					type = "postinstall";
+					data = "/dev/${FILESYSTEM_DEVICE}p2 ${FW_ENV_DEVICE} 0x50000";
+					hook = "format_data";
+				}
+			);
+		}
+		copy-b: {
+			images: (
+				{
+					filename = "core-image-minimal-hailo15-ne503.ext4.gz";
+					device = "/dev/${FILESYSTEM_DEVICE}p4";
+					hook = "format_device";
+					installed-directly = true;
+					compressed = "zlib";
+				},
+				{
+					filename = "hailo15_scu_fw.bin";
+					device = "/dev/${FIRMWARE_DEVICE}";
+					hook = "format_device";
+					offset = "0x80000";
+				},
+				{
+					filename = "u-boot.dtb.signed";
+					device = "/dev/${FIRMWARE_DEVICE}";
+					hook = "format_device";
+					offset = "0xB8000";
+				},
+				{
+					filename = "customer_certificate.bin";
+					device = "/dev/${FIRMWARE_DEVICE}";
+					hook = "format_device";
+					offset = "0xC7000";
+				},
+				{
+					filename = "u-boot-initial-env.bin";
+					device = "/dev/${FIRMWARE_DEVICE}";
+					hook = "format_device";
+					offset = "0xC8000";
+				},
+				{
+					filename = "u-boot-spl.bin";
+					device = "/dev/${FIRMWARE_DEVICE}";
+					hook = "format_device";
+					offset = "0xCC000";
+				},
+			);
+			files: (
+				{
+					filename = "fitImage";
+					path = "/fitImage";
+					device = "/dev/${FILESYSTEM_DEVICE}p3";
+					hook = "format_device";
+					filesystem = "vfat";
+				},
+				{
+					filename = "swupdate-image-hailo15-ne503.ext4.gz";
+					path = "/swupdate-image-hailo15-ne503.ext4.gz";
+					device = "/dev/${FILESYSTEM_DEVICE}p3";
+					hook = "format_device";
+					filesystem = "vfat";
+				},
+				{
+					filename = "u-boot-tfa.itb";
+					path = "/u-boot-tfa.itb";
+					device = "/dev/${FILESYSTEM_DEVICE}p3";
+					hook = "format_device";
+					filesystem = "vfat";
+				},
+			);
+			scripts: (
+				{
+					filename = "resize_fs.sh";
+					type = "postinstall";
+					data = "/dev/${FILESYSTEM_DEVICE}p4";
+					hook = "format_data";
+				},
+				{
+					filename = "update_fw_env.sh";
+					type = "postinstall";
+					data = "/dev/${FILESYSTEM_DEVICE}p4 ${FW_ENV_DEVICE} 0xC8000";
+					hook = "format_data";
+				}
+			);
+		}
+		init-scu-bl: {
+			images: (
+				{
+					filename = "hailo15_scu_bl.bin";
+					device = "/dev/${FIRMWARE_DEVICE}";
+					hook = "format_device";
+					offset = "0";
+				},
+				{
+					filename = "scu_bl_cfg_a.bin";
+					device = "/dev/${FIRMWARE_DEVICE}";
+					hook = "format_device";
+					offset = "0x5000";
+				},
+				{
+					filename = "scu_bl_cfg_a.bin";
+					device = "/dev/${FIRMWARE_DEVICE}";
+					hook = "format_device";
+					offset = "0x6000";
+				},
+			);
+		}
+		init-partitions-single: {
+			partitions: (
+				{
+					type = "diskpart";
+					device = "/dev/${FILESYSTEM_DEVICE}";
+					hook = "format_device";
+					properties: {
+						labeltype = "gpt";
+						partition-1 = [ "size=64M", "start=2048",
+							"name=boot", "type=BC13C2FF-59E6-4262-A352-B275FD6F7172",
+							"fstype=fat32"];
+						partition-2 = [ "size=3664M", "start=133120",
+							"name=rootfs", "type=B921B045-1DF0-41C3-AF44-4C6F280D3FAE",
+							"fstype=ext4"];
+						partition-3 = [ "start=7636992",
+							"name=data", "type=B921B045-1DF0-41C3-AF44-4C6F280D3FAE",
+							"fstype=ext4"];
+					}
+				}
+			);
+			scripts: (
+				{
+					filename = "resize_fs.sh";
+					type = "postinstall";
+					data = "/dev/${FILESYSTEM_DEVICE}p3";
+					hook = "format_data";
+				}
+			);
+		}
+		init-partitions-dual: {
+			partitions: (
+				{
+					type = "diskpart";
+					device = "/dev/${FILESYSTEM_DEVICE}";
+					hook = "format_device";
+					properties: {
+						labeltype = "gpt";
+						partition-1 = [ "size=64M", "start=2048",
+							"name=boot", "type=BC13C2FF-59E6-4262-A352-B275FD6F7172",
+							"fstype=fat32"];
+						partition-2 = [ "size=3664M", "start=133120",
+							"name=rootfs", "type=B921B045-1DF0-41C3-AF44-4C6F280D3FAE",
+							"fstype=ext4"];
+						partition-3 = [ "size=64M", "start=7636992",
+							"name=boot", "type=BC13C2FF-59E6-4262-A352-B275FD6F7172",
+							"fstype=fat32"];
+						partition-4 = [ "size=3664M", "start=7768064",
+							"name=rootfs", "type=B921B045-1DF0-41C3-AF44-4C6F280D3FAE",
+							"fstype=ext4"];
+						partition-5 = [ "start=15271936",
+							"name=data", "type=B921B045-1DF0-41C3-AF44-4C6F280D3FAE",
+							"fstype=ext4"];
+					}
+				}
+			);
+			scripts: (
+				{
+					filename = "resize_fs.sh";
+					type = "postinstall";
+					data = "/dev/${FILESYSTEM_DEVICE}p5";
+					hook = "format_data";
+				}
+			);
+		}
+	}
+}

@@ -1,0 +1,323 @@
+# NE503 AIPC platform Makefile
+
+.PHONY: all clean distclean test test-unit test-integration proto \
+  proto-inference proto-device proto-event proto-camera proto-app proto-lens proto-discovery \
+  hal-v2 platform ai-runtime device-control event-bus app-manager platform-api \
+  device-discovery os-updater camera-daemon web aipc-cli tools pack pack-release \
+  docker-pack-release _pack-stage _pack-internal fmt lint help
+
+-include Makefile.local
+
+BUILD_DIR ?= build/output
+VERSION ?= $(shell git describe --tags --always --dirty 2>/dev/null || date +%Y%m%d-%H%M%S)
+RELEASE_DIR ?= build/release
+PKG_NAME = aipc-$(HAL_PLATFORM)-$(VERSION)
+STAGE_DIR = $(RELEASE_DIR)/$(PKG_NAME)
+TARBALL = $(RELEASE_DIR)/$(PKG_NAME).tar.gz
+SDK_PATH ?= $(or $(HAILO_SDK_PATH),/opt/hailo-sdk)
+DOCKER_RELEASE_IMAGE ?= zerobot/ne503-dev-env-full:4.0.23
+DOCKER_RELEASE_WORKDIR ?= /ne503
+DOCKER_RELEASE_SDK_PATH ?= /opt/hailo-sdk
+DOCKER_RELEASE_NODE_VERSION ?= 24.18.0
+DOCKER_RELEASE_PNPM_VERSION ?= 10.34.5
+DOCKER_PULL ?= 1
+AIPC_COMPAT_LEVEL ?= 1
+AIPC_DATA_SCHEMA ?= 1
+AIPC_MACHINE ?= hailo15-ne503
+AIPC_PRODUCT ?= ne503
+SKIP_STAGE_TARBALL ?= 0
+HAL_PLATFORM ?= stub
+GO ?= go
+GO_BUILD_FLAGS ?= -v -mod=mod
+GO_TEST_FLAGS ?= -v -race
+GO_CACHE_DIR ?= /tmp/aipc-go-cache
+CMAKE ?= cmake
+CMAKE_BUILD_TYPE ?= Release
+PROTOC ?= protoc
+
+PROTO_GO_PLUGIN := --go_out=. --go_opt=paths=source_relative --go-grpc_out=. --go-grpc_opt=paths=source_relative
+PROTOC_OPT := --experimental_allow_proto3_optional
+CMAKE_TARGET_ARGS := -DCMAKE_BUILD_TYPE=$(CMAKE_BUILD_TYPE)
+SYSROOT_ENV :=
+
+ifeq ($(HAL_PLATFORM),hailo15)
+AIPC_GO_ENV := GOCACHE=$(GO_CACHE_DIR) CGO_ENABLED=0 GOOS=linux GOARCH=arm64
+ifneq ($(CMAKE_TOOLCHAIN_FILE),)
+CMAKE_TARGET_ARGS += -DCMAKE_TOOLCHAIN_FILE=$(CMAKE_TOOLCHAIN_FILE)
+else ifneq ($(wildcard $(CURDIR)/cmake/toolchain-aarch64-hailo.cmake),)
+CMAKE_TARGET_ARGS += -DCMAKE_TOOLCHAIN_FILE=$(CURDIR)/cmake/toolchain-aarch64-hailo.cmake
+endif
+ifneq ($(SDK_PATH),)
+export HAILO_SDK_PATH := $(SDK_PATH)
+CMAKE_TARGET_ARGS += -DHAILO_SDK_PATH=$(SDK_PATH)
+POKY_ENV_SCRIPT := $(firstword $(wildcard $(SDK_PATH)/environment-setup-*-poky-linux))
+ifneq ($(POKY_ENV_SCRIPT),)
+SYSROOT_ENV := . $(POKY_ENV_SCRIPT) &&
+endif
+endif
+else
+AIPC_GO_ENV := GOCACHE=$(GO_CACHE_DIR) CGO_ENABLED=0
+endif
+
+all: proto hal-v2 platform ai-runtime camera-daemon aipc-cli
+
+proto: proto-inference proto-device proto-event proto-camera proto-app proto-lens proto-discovery
+ifeq ($(HAL_PLATFORM),hailo15)
+	@if [ -n "$(SDK_PATH)" ]; then ./scripts/generate_proto_arm.sh --sdk-path "$(SDK_PATH)"; fi
+endif
+
+proto-inference:
+	cd platform/ai-runtime/proto && $(PROTOC) $(PROTO_GO_PLUGIN) inference.proto
+
+proto-device:
+	cd platform/device-control/proto && $(PROTOC) $(PROTO_GO_PLUGIN) device.proto
+
+proto-event:
+	cd platform/event-bus/proto && $(PROTOC) $(PROTO_GO_PLUGIN) event.proto
+
+proto-camera:
+	@if [ -f platform/camera-daemon/proto/camera.proto ]; then \
+		cd platform/camera-daemon/proto && $(PROTOC) $(PROTOC_OPT) $(PROTO_GO_PLUGIN) camera.proto; \
+	fi
+
+proto-app:
+	@if [ -f platform/app-manager/proto/app.proto ]; then \
+		cd platform/app-manager/proto && $(PROTOC) $(PROTO_GO_PLUGIN) app.proto; \
+	fi
+
+proto-lens:
+	@mkdir -p platform/device-control/lens/lenspb
+	$(PROTOC) --proto_path=platform/camera-daemon/proto $(PROTOC_OPT) \
+		--go_out=platform/device-control/lens/lenspb --go_opt=paths=source_relative \
+		--go-grpc_out=platform/device-control/lens/lenspb --go-grpc_opt=paths=source_relative \
+		platform/camera-daemon/proto/lens_hal.proto
+
+proto-discovery:
+	cd platform/device-discovery/proto && $(PROTOC) $(PROTO_GO_PLUGIN) discovery.proto
+
+hal-v2:
+	@echo "==> Building HAL v2 [platform=$(HAL_PLATFORM)]"
+	@mkdir -p hal_v2/build-$(HAL_PLATFORM)
+	cd hal_v2/build-$(HAL_PLATFORM) && $(SYSROOT_ENV) $(CMAKE) $(CMAKE_TARGET_ARGS) -DHAL_PLATFORM=$(HAL_PLATFORM) ..
+	cd hal_v2/build-$(HAL_PLATFORM) && $(SYSROOT_ENV) $(MAKE) -j$$(nproc)
+	@mkdir -p $(BUILD_DIR)/hal/$(HAL_PLATFORM)
+	@cp -P hal_v2/build-$(HAL_PLATFORM)/libaipc_hal*.so* hal_v2/build-$(HAL_PLATFORM)/libhal-*.so* $(BUILD_DIR)/hal/$(HAL_PLATFORM)/ 2>/dev/null || true
+
+platform: device-control event-bus app-manager platform-api device-discovery os-updater
+
+ai-runtime: proto
+	@echo "==> Building ai-runtime"
+	@mkdir -p platform/ai-runtime/build-$(HAL_PLATFORM) $(BUILD_DIR)
+	cd platform/ai-runtime/build-$(HAL_PLATFORM) && $(SYSROOT_ENV) $(CMAKE) $(CMAKE_TARGET_ARGS) .. && $(SYSROOT_ENV) $(MAKE) -j$$(nproc)
+	cp platform/ai-runtime/build-$(HAL_PLATFORM)/ai-runtime $(BUILD_DIR)/
+
+device-control: proto
+	@mkdir -p $(BUILD_DIR)
+	$(AIPC_GO_ENV) $(GO) build $(GO_BUILD_FLAGS) -o $(CURDIR)/$(BUILD_DIR)/device-control ./platform/device-control/server
+
+event-bus: proto
+	@mkdir -p $(BUILD_DIR)
+	cd platform/event-bus/server && $(AIPC_GO_ENV) $(GO) build $(GO_BUILD_FLAGS) -o $(CURDIR)/$(BUILD_DIR)/event-bus .
+
+app-manager: proto
+	@mkdir -p $(BUILD_DIR)
+	cd platform/app-manager && $(AIPC_GO_ENV) $(GO) build $(GO_BUILD_FLAGS) -o $(CURDIR)/$(BUILD_DIR)/app-manager ./cmd
+
+platform-api: proto
+	@mkdir -p $(BUILD_DIR)
+	cd platform/platform-api/server && $(AIPC_GO_ENV) $(GO) build $(GO_BUILD_FLAGS) -o $(CURDIR)/$(BUILD_DIR)/platform-api .
+
+device-discovery: proto
+	@mkdir -p $(BUILD_DIR)
+	cd platform/device-discovery/server && $(AIPC_GO_ENV) $(GO) build $(GO_BUILD_FLAGS) -o $(CURDIR)/$(BUILD_DIR)/device-discovery .
+
+os-updater:
+	@mkdir -p $(BUILD_DIR)
+	cd platform/os-updater && $(AIPC_GO_ENV) $(GO) build $(GO_BUILD_FLAGS) -o $(CURDIR)/$(BUILD_DIR)/aipc-os-updater .
+
+camera-daemon: proto
+	@echo "==> Building camera-daemon"
+	@mkdir -p platform/camera-daemon/build-$(HAL_PLATFORM) $(BUILD_DIR)
+	cd platform/camera-daemon/build-$(HAL_PLATFORM) && $(SYSROOT_ENV) $(CMAKE) $(CMAKE_TARGET_ARGS) .. && $(SYSROOT_ENV) $(MAKE) -j$$(nproc)
+	cp platform/camera-daemon/build-$(HAL_PLATFORM)/camera-daemon $(BUILD_DIR)/
+
+web:
+	cd web && pnpm install && pnpm run build
+
+aipc-cli:
+	@mkdir -p $(BUILD_DIR)
+	$(AIPC_GO_ENV) $(GO) build $(GO_BUILD_FLAGS) -o $(CURDIR)/$(BUILD_DIR)/aipc-cli ./tools/aipc-cli
+
+tools:
+	@mkdir -p tools/shm-reader/build-$(HAL_PLATFORM) tools/nv12-to-jpeg/build-$(HAL_PLATFORM)
+	cd tools/shm-reader/build-$(HAL_PLATFORM) && $(SYSROOT_ENV) $(CMAKE) $(CMAKE_TARGET_ARGS) .. && $(SYSROOT_ENV) $(MAKE) -j$$(nproc)
+	cd tools/nv12-to-jpeg/build-$(HAL_PLATFORM) && $(SYSROOT_ENV) $(CMAKE) $(CMAKE_TARGET_ARGS) .. && $(SYSROOT_ENV) $(MAKE) -j$$(nproc)
+
+docker-pack-release:
+	@echo "==> Building Hailo-15 release package in Docker"
+	@echo "    image: $(DOCKER_RELEASE_IMAGE)"
+	@if [ "$(DOCKER_PULL)" = "1" ]; then docker pull "$(DOCKER_RELEASE_IMAGE)"; fi
+	docker run --rm -t \
+		--entrypoint /bin/bash \
+		-v "$(CURDIR):$(DOCKER_RELEASE_WORKDIR)" \
+		-w "$(DOCKER_RELEASE_WORKDIR)" \
+		-e SDK_PATH="$(DOCKER_RELEASE_SDK_PATH)" \
+		-e HAILO_SDK_PATH="$(DOCKER_RELEASE_SDK_PATH)" \
+		-e DOCKER_RELEASE_NODE_VERSION="$(DOCKER_RELEASE_NODE_VERSION)" \
+		-e DOCKER_RELEASE_PNPM_VERSION="$(DOCKER_RELEASE_PNPM_VERSION)" \
+		"$(DOCKER_RELEASE_IMAGE)" \
+		-lc 'set -e; \
+			node_major="$$(node -p "process.versions.node.split('\''.'\'')[0]")"; \
+			if [ "$$node_major" -lt 24 ]; then \
+				node_dist="node-v$$DOCKER_RELEASE_NODE_VERSION-linux-x64"; \
+				node_dir="/tmp/$$node_dist"; \
+				if [ ! -x "$$node_dir/bin/node" ]; then \
+					curl -fsSL "https://nodejs.org/dist/v$$DOCKER_RELEASE_NODE_VERSION/$$node_dist.tar.gz" | tar -xz -C /tmp; \
+				fi; \
+				export PATH="$$node_dir/bin:$$PATH"; \
+			fi; \
+			node -v; \
+			corepack enable; \
+			corepack prepare "pnpm@$$DOCKER_RELEASE_PNPM_VERSION" --activate; \
+			pnpm -v; \
+			make pack-release SDK_PATH="$$SDK_PATH" HAILO_SDK_PATH="$$HAILO_SDK_PATH" VERSION="$(VERSION)" BUILD_MCU_FW="$(BUILD_MCU_FW)"'
+
+pack: all web
+	$(MAKE) _pack-stage HAL_PLATFORM="$(HAL_PLATFORM)" VERSION="$(VERSION)"
+
+pack-release:
+	@if [ ! -d "$(SDK_PATH)" ]; then \
+		echo "ERROR: SDK not found at $(SDK_PATH). Set SDK_PATH=/path/to/poky-sdk or HAILO_SDK_PATH."; \
+		exit 1; \
+	fi
+	$(MAKE) all web HAL_PLATFORM=hailo15 SDK_PATH="$(SDK_PATH)" VERSION="$(VERSION)"
+	$(MAKE) _pack-internal HAL_PLATFORM=hailo15 SDK_PATH="$(SDK_PATH)" VERSION="$(VERSION)"
+
+_pack-stage:
+	@echo "==> Packaging release [$(VERSION), platform=$(HAL_PLATFORM)]"
+	@missing=""; \
+	for b in camera-daemon ai-runtime device-control event-bus platform-api app-manager aipc-cli device-discovery aipc-os-updater; do \
+		[ -x "$(BUILD_DIR)/$$b" ] || missing="$$missing $$b"; \
+	done; \
+	[ -e "$(BUILD_DIR)/hal/$(HAL_PLATFORM)/libaipc_hal.so" ] || missing="$$missing libaipc_hal.so"; \
+	if [ -n "$$missing" ]; then \
+		echo "ERROR: missing platform binaries in $(BUILD_DIR):$$missing"; \
+		echo "       Run 'make all' before packaging."; \
+		exit 1; \
+	fi
+	@rm -rf "$(STAGE_DIR)" "$(TARBALL)"
+	@mkdir -p "$(STAGE_DIR)/opt/aipc/bin" \
+		"$(STAGE_DIR)/opt/aipc/libexec" \
+		"$(STAGE_DIR)/opt/aipc/lib/hal" \
+		"$(STAGE_DIR)/opt/aipc/etc/security" \
+		"$(STAGE_DIR)/opt/aipc/scripts" \
+		"$(STAGE_DIR)/opt/aipc/web" \
+		"$(STAGE_DIR)/opt/aipc/swagger-ui" \
+		"$(STAGE_DIR)/opt/aipc/models" \
+		"$(STAGE_DIR)/systemd"
+	@for f in camera-daemon ai-runtime device-control event-bus platform-api app-manager aipc-cli device-discovery; do \
+		cp "$(BUILD_DIR)/$$f" "$(STAGE_DIR)/opt/aipc/bin/"; \
+		echo "  + $$f"; \
+	done
+	@cp "$(BUILD_DIR)/aipc-os-updater" "$(STAGE_DIR)/opt/aipc/libexec/" && echo "  + aipc-os-updater"
+	@cp -P $(BUILD_DIR)/hal/$(HAL_PLATFORM)/libaipc_hal*.so* $(BUILD_DIR)/hal/$(HAL_PLATFORM)/libhal-*.so* "$(STAGE_DIR)/opt/aipc/lib/hal/" 2>/dev/null || true
+	@cp -f configs/platform/*.yaml "$(STAGE_DIR)/opt/aipc/etc/" 2>/dev/null || true
+	@cp -f configs/ai/*.yaml "$(STAGE_DIR)/opt/aipc/etc/" 2>/dev/null || true
+	@cp -f configs/platform-api.yaml "$(STAGE_DIR)/opt/aipc/etc/" 2>/dev/null || true
+	@cp -f configs/security/seccomp-default.json "$(STAGE_DIR)/opt/aipc/etc/security/" 2>/dev/null || true
+	@for unit in systemd/*.service systemd/*.timer systemd/*.target; do \
+		[ -f "$$unit" ] || continue; \
+		install -m 0644 "$$unit" "$(STAGE_DIR)/systemd/"; \
+	done
+	@cp -f scripts/deploy.sh "$(STAGE_DIR)/deploy.sh" 2>/dev/null && chmod +x "$(STAGE_DIR)/deploy.sh" || true
+	@for script in aipc-install-current-root.sh aipc-compat-check.sh aipc-firstboot.sh aipc-restore.sh aipc-firstboot-os.sh aipc-autostart.sh aipc-osd-apply.sh aipc-healthmon.sh aipc-logrotate.sh aipc-os-layout-check.sh aipc-mcu-prep.sh download_models.sh; do \
+		[ -f "scripts/$$script" ] || continue; \
+		cp -f "scripts/$$script" "$(STAGE_DIR)/opt/aipc/scripts/"; \
+		chmod +x "$(STAGE_DIR)/opt/aipc/scripts/$$script"; \
+	done
+	@[ -d web/dist ] && cp -r web/dist/* "$(STAGE_DIR)/opt/aipc/web/" && echo "  + web console" || true
+	@cp -f platform/platform-api/swagger-ui/* "$(STAGE_DIR)/opt/aipc/swagger-ui/" 2>/dev/null || true
+	@cp -f docs/api/swagger.yaml "$(STAGE_DIR)/opt/aipc/etc/swagger.yaml" 2>/dev/null || true
+	@for cat in detection classification segmentation keypoint clip depth ocr genai; do \
+		mkdir -p "$(STAGE_DIR)/opt/aipc/models/$$cat"; \
+	done
+	@printf '%s\n' \
+		"version=$(VERSION)" \
+		"build_date=$$(date +%Y%m%d-%H%M%S)" \
+		"git_commit=$$(git rev-parse --short HEAD 2>/dev/null || echo unknown)" \
+		"platform=$(HAL_PLATFORM)" > "$(STAGE_DIR)/VERSION"
+	@printf '%s\n' \
+		'{' \
+		'  "app_version": "$(VERSION)",' \
+		'  "machine": "$(AIPC_MACHINE)",' \
+		'  "product": "$(AIPC_PRODUCT)",' \
+		'  "required_compat_level": $(AIPC_COMPAT_LEVEL),' \
+		'  "supported_data_schema": [$(AIPC_DATA_SCHEMA)],' \
+		'  "target_data_schema": $(AIPC_DATA_SCHEMA)' \
+		'}' > "$(STAGE_DIR)/opt/aipc/app-manifest.json"
+	@if [ "$(SKIP_STAGE_TARBALL)" != "1" ]; then \
+		mkdir -p "$(RELEASE_DIR)"; \
+		tar czf "$(TARBALL)" -C "$(RELEASE_DIR)" "$(PKG_NAME)"; \
+		echo "=== Release Package Ready ==="; \
+		echo "  File: $(TARBALL)"; \
+		echo "  Size: $$(du -h "$(TARBALL)" | cut -f1)"; \
+	fi
+
+_pack-internal: SKIP_STAGE_TARBALL = 1
+_pack-internal: _pack-stage
+	@IMAGING_BASE="$(SDK_PATH)/sysroots/armv8a-poky-linux/etc/imaging"; \
+	if [ -d "$$IMAGING_BASE" ]; then \
+		mkdir -p "$(STAGE_DIR)/opt/aipc/etc/imaging"; \
+		cp -a "$$IMAGING_BASE"/. "$(STAGE_DIR)/opt/aipc/etc/imaging/"; \
+		echo "  + imaging configs"; \
+	else \
+		echo "  - imaging configs not found at $$IMAGING_BASE"; \
+	fi
+	@mkdir -p "$(RELEASE_DIR)"
+	tar czf "$(TARBALL)" -C "$(RELEASE_DIR)" "$(PKG_NAME)"
+	@echo "=== Release Package Ready ==="
+	@echo "  File: $(TARBALL)"
+	@echo "  Size: $$(du -h "$(TARBALL)" | cut -f1)"
+
+test: test-unit test-integration
+
+test-unit: proto
+	$(GO) test $(GO_TEST_FLAGS) ./platform/... ./tests/unit
+
+test-integration: proto
+	$(GO) test -v ./tests/integration
+
+fmt:
+	$(GO) fmt ./platform/... ./tests/...
+	@if command -v clang-format >/dev/null 2>&1; then \
+		find hal_v2 platform tools tests -name "*.c" -o -name "*.h" -o -name "*.cpp" | xargs clang-format -i; \
+	fi
+
+lint:
+	golangci-lint run ./platform/...
+
+clean:
+	rm -rf build/output build/release
+	rmdir build 2>/dev/null || true
+	find hal_v2 platform tools -maxdepth 3 -type d \( -name "build-*" -o -name "build_*" \) -prune -exec rm -rf {} +
+	find platform -path "*/proto/*.pb.go" -delete
+	rm -rf platform/device-control/lens/lenspb
+
+distclean: clean
+	rm -rf web/node_modules web/dist web/.husky/_
+	find . -name "__pycache__" -type d -prune -exec rm -rf {} +
+	find . -name "*.pyc" -delete
+
+help:
+	@echo "NE503 AIPC platform targets:"
+	@echo "  make all              Build proto, HAL v2, Go services, C++ services, and CLI"
+	@echo "  make proto            Compile protobuf definitions"
+	@echo "  make hal-v2           Build HAL v2, default HAL_PLATFORM=stub"
+	@echo "  make platform         Build Go platform services"
+	@echo "  make camera-daemon    Build C++ camera daemon"
+	@echo "  make ai-runtime       Build C++ AI runtime"
+	@echo "  make web              Build web console"
+	@echo "  make pack             Build native stub release tarball"
+	@echo "  make pack-release     Build Hailo-15 release tarball (requires SDK_PATH)"
+	@echo "  make docker-pack-release Build Hailo-15 release tarball in Docker"
+	@echo "  make test             Run unit and integration tests"
