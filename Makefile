@@ -181,6 +181,7 @@ docker-pack-release:
 		"$(DOCKER_RELEASE_IMAGE)" \
 		-lc 'set -e; \
 			trap "chown -R $$HOST_UID:$$HOST_GID build hal_v2 platform web tools mcu_board_prj 2>/dev/null || true" EXIT; \
+			git config --global --add safe.directory "$$PWD"; \
 			if ! command -v python >/dev/null 2>&1 && command -v python3 >/dev/null 2>&1; then ln -sf "$$(command -v python3)" /usr/local/bin/python; fi; \
 			case "$$BUILD_MCU_FW" in 1|yes|true|on) \
 				if ! command -v arm-none-eabi-gcc >/dev/null 2>&1; then \
