@@ -3,7 +3,7 @@
 .PHONY: all clean distclean test test-unit test-integration proto \
   proto-inference proto-device proto-event proto-camera proto-app proto-lens proto-discovery \
   hal-v2 platform ai-runtime device-control event-bus app-manager platform-api \
-  device-discovery os-updater camera-daemon web aipc-cli tools pack pack-release \
+  device-discovery os-updater camera-daemon web aipc-cli tools mcu-firmware pack pack-release \
   docker-pack-release _pack-stage _pack-internal fmt lint help
 
 -include Makefile.local
@@ -29,6 +29,9 @@ AIPC_MACHINE ?= hailo15-ne503
 AIPC_PRODUCT ?= ne503
 SKIP_STAGE_TARBALL ?= 0
 BUILD_MCU_FW ?= 0
+MCU_MAKE_ARGS ?= RELEASE=1
+MCU_FW_BUILD_DIR ?= mcu_board_prj/build
+MCU_FW_DIR ?= $(BUILD_DIR)/mcu-firmware
 HAL_PLATFORM ?= stub
 GO ?= go
 GO_BUILD_FLAGS ?= -v -mod=mod
@@ -165,14 +168,30 @@ docker-pack-release:
 	@if [ "$(DOCKER_PULL)" = "1" ]; then docker pull "$(DOCKER_RELEASE_IMAGE)"; fi
 	docker run --rm -t \
 		--entrypoint /bin/bash \
+		--user root \
 		-v "$(CURDIR):$(DOCKER_RELEASE_WORKDIR)" \
 		-w "$(DOCKER_RELEASE_WORKDIR)" \
 		-e SDK_PATH="$(DOCKER_RELEASE_SDK_PATH)" \
 		-e HAILO_SDK_PATH="$(DOCKER_RELEASE_SDK_PATH)" \
+		-e BUILD_MCU_FW="$(BUILD_MCU_FW)" \
+		-e HOST_UID="$$(id -u)" \
+		-e HOST_GID="$$(id -g)" \
 		-e DOCKER_RELEASE_NODE_VERSION="$(DOCKER_RELEASE_NODE_VERSION)" \
 		-e DOCKER_RELEASE_PNPM_VERSION="$(DOCKER_RELEASE_PNPM_VERSION)" \
 		"$(DOCKER_RELEASE_IMAGE)" \
 		-lc 'set -e; \
+			trap "chown -R $$HOST_UID:$$HOST_GID build hal_v2 platform web tools mcu_board_prj 2>/dev/null || true" EXIT; \
+			if ! command -v python >/dev/null 2>&1 && command -v python3 >/dev/null 2>&1; then ln -sf "$$(command -v python3)" /usr/local/bin/python; fi; \
+			case "$$BUILD_MCU_FW" in 1|yes|true|on) \
+				if ! command -v arm-none-eabi-gcc >/dev/null 2>&1; then \
+					if ! command -v apt-get >/dev/null 2>&1; then echo "ERROR: arm-none-eabi-gcc is required for BUILD_MCU_FW=1"; exit 1; fi; \
+					export DEBIAN_FRONTEND=noninteractive; \
+					apt-get update; \
+					apt-get install -y --no-install-recommends gcc-arm-none-eabi binutils-arm-none-eabi; \
+					rm -rf /var/lib/apt/lists/*; \
+				fi; \
+				arm-none-eabi-gcc --version | head -1; \
+			;; esac; \
 			node_major="$$(node -p "process.versions.node.split('\''.'\'')[0]")"; \
 			if [ "$$node_major" -lt 24 ]; then \
 				node_dist="node-v$$DOCKER_RELEASE_NODE_VERSION-linux-x64"; \
@@ -186,7 +205,30 @@ docker-pack-release:
 			corepack enable; \
 			corepack prepare "pnpm@$$DOCKER_RELEASE_PNPM_VERSION" --activate; \
 			pnpm -v; \
-			make pack-release SDK_PATH="$$SDK_PATH" HAILO_SDK_PATH="$$HAILO_SDK_PATH" VERSION="$(VERSION)" BUILD_MCU_FW="$(BUILD_MCU_FW)"'
+			make pack-release SDK_PATH="$$SDK_PATH" HAILO_SDK_PATH="$$HAILO_SDK_PATH" VERSION="$(VERSION)" BUILD_MCU_FW="$$BUILD_MCU_FW"'
+
+mcu-firmware:
+	@echo "==> Building MCU firmware ($(MCU_MAKE_ARGS))"
+	@rm -rf "$(MCU_FW_BUILD_DIR)"
+	@if [ "$(MCU_FW_DIR)" != "mcu_board_prj/firmware" ]; then rm -rf "$(MCU_FW_DIR)"; fi
+	$(MAKE) -C mcu_board_prj $(MCU_MAKE_ARGS)
+	@mkdir -p "$(MCU_FW_DIR)"
+	@found_ota=0; \
+	for f in \
+		"$(MCU_FW_BUILD_DIR)"/ne503_mcu_boot.bin \
+		"$(MCU_FW_BUILD_DIR)"/ne503_mcu_boot.elf \
+		"$(MCU_FW_BUILD_DIR)"/ne503_Main_v*.hex \
+		"$(MCU_FW_BUILD_DIR)"/ne503_ota_package_*.bin; do \
+		[ -f "$$f" ] || continue; \
+		cp -f "$$f" "$(MCU_FW_DIR)/"; \
+		echo "  + mcu firmware: $$(basename "$$f")"; \
+		case "$$f" in */ne503_ota_package_*.bin) found_ota=1 ;; esac; \
+	done; \
+	if [ "$$found_ota" -ne 1 ]; then \
+		echo "ERROR: MCU build completed but no $(MCU_FW_BUILD_DIR)/ne503_ota_package_*.bin was found"; \
+		exit 1; \
+	fi; \
+	echo "==> MCU firmware staged in $(MCU_FW_DIR)"
 
 pack: all tools web
 	$(MAKE) _pack-stage HAL_PLATFORM="$(HAL_PLATFORM)" VERSION="$(VERSION)"
@@ -196,11 +238,9 @@ pack-release:
 		echo "ERROR: SDK not found at $(SDK_PATH). Set SDK_PATH=/path/to/poky-sdk or HAILO_SDK_PATH."; \
 		exit 1; \
 	fi
-	@if [ "$(BUILD_MCU_FW)" = "1" ]; then \
-		echo "ERROR: BUILD_MCU_FW is not available in this public snapshot."; \
-		echo "       Commit prebuilt OTA packages under mcu_board_prj/firmware instead."; \
-		exit 1; \
-	fi
+ifneq ($(filter 1 yes true on,$(BUILD_MCU_FW)),)
+	$(MAKE) mcu-firmware
+endif
 	$(MAKE) all tools web HAL_PLATFORM=hailo15 SDK_PATH="$(SDK_PATH)" VERSION="$(VERSION)"
 	$(MAKE) _pack-internal HAL_PLATFORM=hailo15 SDK_PATH="$(SDK_PATH)" VERSION="$(VERSION)"
 
@@ -287,7 +327,7 @@ _pack-stage:
 	else echo "  - ne503_boot_prep not built"; fi
 	@mkdir -p "$(STAGE_DIR)/opt/aipc/firmware/mcu"
 	@found=0; \
-	for dir in mcu_board_prj/firmware firmware/mcu; do \
+	for dir in "$(MCU_FW_DIR)" mcu_board_prj/firmware firmware/mcu; do \
 		for f in "$$dir"/ne503_ota_package_*.bin; do \
 			[ -f "$$f" ] || continue; \
 			cp -f "$$f" "$(STAGE_DIR)/opt/aipc/firmware/mcu/"; \

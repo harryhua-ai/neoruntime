@@ -30,6 +30,7 @@ Hardware and vendor runtimes
 | ---- | -------- |
 | `platform/` | Go and C++ platform services |
 | `hal_v2/` | HAL v2 session-based C/C++ interfaces and backends |
+| `mcu_board_prj/` | STM32G0 MCU firmware source and OTA packaging tools |
 | `web/` | React and TypeScript management console |
 | `configs/` | Service configuration templates |
 | `systemd/` | System service units |
@@ -73,11 +74,22 @@ Build a Hailo-15 package with a local SDK:
 make pack-release SDK_PATH=/opt/poky/4.0.23 VERSION=0.1.0
 ```
 
+Build and package MCU OTA firmware from source before creating the Hailo-15
+package:
+
+```bash
+make pack-release SDK_PATH=/opt/poky/4.0.23 VERSION=0.1.0 BUILD_MCU_FW=1
+```
+
 Build the same Hailo-15 package through the full Docker image:
 
 ```bash
 make docker-pack-release VERSION=0.1.0
 ```
+
+The Docker release path installs `arm-none-eabi-gcc` on demand when
+`BUILD_MCU_FW=1`. Without that flag, the package uses the checked-in OTA payloads
+under `mcu_board_prj/firmware/`.
 
 The release workflow in `.github/workflows/release.yml` uses
 `zerobot/ne503-dev-env-full:4.0.23` and expects a self-hosted runner with the
