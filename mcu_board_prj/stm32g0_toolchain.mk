@@ -38,7 +38,7 @@ MCU_FLAGS := -mcpu=$(MCU_CPU) -mthumb -mfloat-abi=soft
 
 # Match STM32CubeIDE (GNU Tools for STM32): nano.specs, sections, warnings
 COMMON_CFLAGS := $(MCU_FLAGS) $(OPT_CFLAGS) -std=gnu11 \
-	-ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity \
+	-ffunction-sections -fdata-sections -Wall -fstack-usage \
 	--specs=nano.specs
 
 COMMON_ASFLAGS := $(MCU_FLAGS) $(OPT_ASFLAGS) --specs=nano.specs

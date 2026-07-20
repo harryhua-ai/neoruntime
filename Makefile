@@ -187,7 +187,7 @@ docker-pack-release:
 					if ! command -v apt-get >/dev/null 2>&1; then echo "ERROR: arm-none-eabi-gcc is required for BUILD_MCU_FW=1"; exit 1; fi; \
 					export DEBIAN_FRONTEND=noninteractive; \
 					apt-get update; \
-					apt-get install -y --no-install-recommends gcc-arm-none-eabi binutils-arm-none-eabi; \
+					apt-get install -y --no-install-recommends gcc-arm-none-eabi binutils-arm-none-eabi libnewlib-arm-none-eabi; \
 					rm -rf /var/lib/apt/lists/*; \
 				fi; \
 				arm-none-eabi-gcc --version | head -1; \
@@ -209,7 +209,7 @@ docker-pack-release:
 
 mcu-firmware:
 	@echo "==> Building MCU firmware ($(MCU_MAKE_ARGS))"
-	@rm -rf "$(MCU_FW_BUILD_DIR)"
+	@$(MAKE) -C mcu_board_prj clean
 	@if [ "$(MCU_FW_DIR)" != "mcu_board_prj/firmware" ]; then rm -rf "$(MCU_FW_DIR)"; fi
 	$(MAKE) -C mcu_board_prj $(MCU_MAKE_ARGS)
 	@mkdir -p "$(MCU_FW_DIR)"
