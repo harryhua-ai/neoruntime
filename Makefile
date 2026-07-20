@@ -340,11 +340,6 @@ _pack-stage:
 	@cp -f docs/baseboard-mcu-rtc-ota.md "$(STAGE_DIR)/opt/aipc/docs/" 2>/dev/null || true
 	@cp -f configs/calibration/final_calibration.json "$(STAGE_DIR)/opt/aipc/share/calibration/final_calibration.json" 2>/dev/null && echo "  + imu calibration" || echo "  - imu calibration missing"
 	@cp -f scripts/download_models.sh "$(STAGE_DIR)/opt/aipc/bin/download_models.sh" 2>/dev/null && chmod +x "$(STAGE_DIR)/opt/aipc/bin/download_models.sh" || true
-	@if [ -d sdk/python/docs/en/_build/html ]; then \
-		mkdir -p "$(STAGE_DIR)/opt/aipc/web/docs"; \
-		cp -r sdk/python/docs/en/_build/html/* "$(STAGE_DIR)/opt/aipc/web/docs/"; \
-		echo "  + SDK docs"; \
-	fi
 	@[ -d web/dist ] && cp -r web/dist/* "$(STAGE_DIR)/opt/aipc/web/" && echo "  + web console" || true
 	@cp -f platform/platform-api/swagger-ui/* "$(STAGE_DIR)/opt/aipc/swagger-ui/" 2>/dev/null || true
 	@cp -f docs/api/swagger.yaml "$(STAGE_DIR)/opt/aipc/etc/swagger.yaml" 2>/dev/null || true

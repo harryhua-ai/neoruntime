@@ -225,9 +225,6 @@ hal_v2/build*
 # Claude
 .claude/
 
-# Python docs
-sdk/python/docs/_build/
-
 # Additional build artifacts
 bin/
 platform/bin/
@@ -317,16 +314,6 @@ bugtap/
 
 # Local fallback copy; release builds use hal_v2/build-*/ne503_boot_prep.
 /tools/ne503_boot_prep
-
-# Docs build output
-sdk/python/docs/en/_build/
-!sdk/
-!sdk/python/
-!sdk/python/docs/
-!sdk/python/docs/en/
-!sdk/python/docs/en/_build/
-!sdk/python/docs/en/_build/html/
-!sdk/python/docs/en/_build/html/**
 
 # Mock bundles
 web/src/mock/_*.bundled_*.mjs
