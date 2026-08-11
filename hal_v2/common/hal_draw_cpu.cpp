@@ -19,6 +19,7 @@
 #include <cstdint>
 #include <cstring>
 #include <string>
+#include <vector>
 
 namespace hal_draw_cpu_internal
 {
