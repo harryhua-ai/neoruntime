@@ -3,6 +3,9 @@ package handlers
 import (
 	"context"
 	"crypto/rsa"
+	"os"
+	"strings"
+	"sync"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -48,6 +51,14 @@ type APIHandlers struct {
 	rsaPriv        *rsa.PrivateKey // decrypts frontend-encrypted passwords; nil -> plaintext fallback
 	rsaPubPEM      string          // served verbatim by GetPublicKey
 	eventLogger    *eventLoggerPkg.Logger
+
+	// blobRefMu makes blob-reference admission atomic with the orphan
+	// sweep: a handler proving a CAS blob exists and then committing a row
+	// that references it (Register/Update/Upload) re-asserts existence and
+	// commits under this lock, while sweepOrphanBlobs recounts references
+	// and deletes under it — closing the window where an aged staged or
+	// deduped blob is collected between the two.
+	blobRefMu sync.Mutex
 }
 
 // NewAPIHandlers creates a new API handlers instance
@@ -109,9 +120,30 @@ func (h *APIHandlers) ConfigManager() *config.Manager {
 
 // System handlers
 
+// firmwareVersion reports the release tag baked at package time
+// (e.g. "v1.0.2"). The deployed VERSION file is key=value lines; the first
+// line is version=<tag>. Read once per process.
+var (
+	firmwareVersionOnce sync.Once
+	firmwareVersionVal  string
+)
+
+func firmwareVersion() string {
+	firmwareVersionOnce.Do(func() {
+		raw, err := os.ReadFile(constants.RootPath() + "/VERSION")
+		if err != nil {
+			firmwareVersionVal = "unknown"
+			return
+		}
+		line := strings.TrimSpace(strings.SplitN(string(raw), "\n", 2)[0])
+		firmwareVersionVal = strings.TrimPrefix(line, "version=")
+	})
+	return firmwareVersionVal
+}
+
 func (h *APIHandlers) GetSystemInfo(c *gin.Context) {
 	info := map[string]interface{}{
-		"version": "0.1.0",
+		"version": firmwareVersion(),
 		"services": map[string]bool{
 			"ai-runtime":     h.grpcClients.AIRuntime != nil,
 			"event-bus":      h.grpcClients.EventBus != nil,
@@ -135,7 +167,7 @@ func (h *APIHandlers) GetSystemStats(c *gin.Context) {
 		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 		defer cancel()
 
-		aiStats, err := client.GetStats(ctx, &inferencepb.Empty{})
+		aiStats, err := client.GetStats(ctx, &inferencepb.GetStatsRequest{})
 		if err == nil {
 			stats["services"].(map[string]interface{})["ai-runtime"] = aiStats
 		}
